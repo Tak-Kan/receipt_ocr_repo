@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # Javaフロントエンドサービス
+  frontend:
+    build:
+      context: ../frontend # フロントエンド専用のDockerfileがあれば指定
+      dockerfile: Dockerfile_Frontend # または、このサービス内で直接Javaベースイメージを指定
+    volumes:
+      - ../frontend:/workspaces/frontend
+    ports:
+      - "8080:8080" # 必要に応じてポートを公開
+    # DevContainerからの接続を維持するために使用
+    command: /bin/sh -c "while sleep 1000; do :; done" 
+
+  # Pythonバックエンドサービス
+  backend:
+    build:
+      context: ../backend # バックエンド専用のDockerfileがあれば指定
+      dockerfile: Dockerfile_Backend
+    image: python:3.11 # 例: 既に用意されているイメージを使用する場合
+    volumes:
+      - ../backend:/workspaces/backend
+    ports:
+      - "5000:5000" # 例: Flask/Djangoなどで使用するポートを公開
+    # DevContainerからの接続を維持するために使用
+    command: /bin/sh -c "while sleep 1000; do :; done"

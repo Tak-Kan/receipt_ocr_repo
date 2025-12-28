@@ -1,0 +1,42 @@
+{
+  "name": "Multi-Service Project (Java & Python)",
+  "dockerComposeFile": "docker-compose.yml", // 作成したdocker-compose.ymlを指定
+  "service": "frontend", // 例としてJavaフロントエンドのコンテナをメインにする
+  "workspaceFolder": "/workspaces/frontend", // メインサービス内の作業フォルダ
+
+  // 複数のフォルダを開く設定（VS Codeの機能）
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces,type=bind",
+  "remoteUser": "root", // 適切なユーザーを指定
+
+  "customizations": {
+    "vscode": {
+      "extensions": [// Java 関連
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-spring-boot-dashboard",
+        // Python 関連
+        "ms-python.python",
+        "ms-python.vscode-pylint",
+        // 共通
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-21",
+            "path": "/usr/local/jdk-21",
+            "default": true
+          }
+        ]
+      }
+    }
+  },
+  
+  // コンテナ起動後に実行するコマンド（依存関係のインストールなど）
+  "postCreateCommand": "cd /workspaces/backend && pip install -r requirements.txt" ,
+  // 必要に応じて、フロントエンドのビルドコマンドも追加
+
+  // コンテナ終了時に停止させる設定
+  "shutdownAction": "stopCompose"
+}
