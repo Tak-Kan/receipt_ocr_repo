@@ -5,8 +5,8 @@
   "workspaceFolder": "/workspaces/frontend", // メインサービス内の作業フォルダ
 
   // 複数のフォルダを開く設定（VS Codeの機能）
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces,type=bind",
-  "remoteUser": "root", // 適切なユーザーを指定
+  // "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces,type=bind",
+  // "remoteUser": "root", // 適切なユーザーを指定
 
   "customizations": {
     "vscode": {
@@ -34,7 +34,7 @@
   },
   
   // コンテナ起動後に実行するコマンド（依存関係のインストールなど）
-  "postCreateCommand": "cd /workspaces/backend && pip install -r requirements.txt" ,
+  "postCreateCommand": "cd ../backend && pip install -r requirements.txt" ,
   // 必要に応じて、フロントエンドのビルドコマンドも追加
 
   // コンテナ終了時に停止させる設定
