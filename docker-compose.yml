@@ -1,35 +1,12 @@
 version: "3.9"
 
 services:
-  #db:
-  #  image: mariadb:10.11
-  #  container_name: sample-mariadb
-  #  restart: unless-stopped
-  #  environment:
-  #    MARIADB_ROOT_PASSWORD: SYSdreamp@ssw0rd
-  #    MARIADB_DATABASE: python_schema
-  #    MARIADB_USER: testuser
-  #    MARIADB_PASSWORD: testP@ssw0rd
-  #  volumes:
-  #    - db-data:/var/lib/mysql
-  #    - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-  #  ports:
-  #    - "3307:3307"
-  #  healthcheck:
-  #    test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-  #    interval: 10s
-  #    timeout: 5s
-  #    retries: 5
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: sample-backend
     restart: unless-stopped
-#    depends_on:
-#      db:
-#        condition: service_healthy
     environment:
       - DB_HOST=192.168.11.26
       - DB_PORT=3307
@@ -48,8 +25,6 @@ services:
       dockerfile: Dockerfile
     container_name: sample-frontend
     restart: unless-stopped
-#    depends_on:
-#      - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mariadb://192.168.11.26:3307/python_schema
       - SPRING_DATASOURCE_USERNAME=testuser
