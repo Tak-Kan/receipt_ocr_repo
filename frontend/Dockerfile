@@ -1,17 +1,22 @@
-FROM maven:3.9-eclipse-temurin-17 AS build
+# frontend/Dockerfile (multi-stage build)
+FROM maven:3.9-eclipse-temurin-17 AS builder
+WORKDIR /build
 
-WORKDIR /app
+# 依存解決のため先に pom をコピーして依存をダウンロード
 COPY pom.xml .
-RUN mvn dependency:go-offline
+# キャッシュ用に依存解決のみ
+# RUN mvn -B -f pom.xml dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 mvn -B -f pom.xml dependency:go-offline -DskipTests
 
+# ソースをコピーしてビルド
 COPY src ./src
-# Spring Boot の実行可能 JAR を作成
-RUN mvn package -DskipTests spring-boot:repackage
+# RUN mvn -B -f pom.xml package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 mvn -B -f pom.xml package -DskipTests
 
+# ランタイムイメージ
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-# jar 名を明示
-COPY --from=build /app/target/demo-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /build/target/demo-0.0.1-SNAPSHOT.jar /app/app.jar
 
 EXPOSE 8080
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
