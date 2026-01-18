@@ -13,7 +13,11 @@
 </head>
 <body>
   <h2>Users</h2>
-  <p><a th:href="@{/top}">Back to Top</a> | <a th:href="@{/logout}">Logout</a></p>
+  <p>
+    <a th:href="@{/top}">Back to Top</a> |
+    <a th:href="@{/admin/roles}">Manage Roles</a> |
+    <a th:href="@{/logout}">Logout</a>
+  </p>
 
   <table>
     <thead>
@@ -25,7 +29,11 @@
       <tr th:each="u : ${users}">
         <td th:text="${u.id}">1</td>
         <td th:text="${u.username}">user</td>
-        <td th:text="${u.roles}">ROLE_USER</td>
+        <td>
+          <span th:each="r, stat : ${u.roles}">
+            <span th:text="${r.name}">ROLE</span><span th:if="${!stat.last}">, </span>
+          </span>
+        </td>
         <td th:text="${u.enabled}">true</td>
         <td class="actions">
           <a th:href="@{|/admin/users/${u.id}/edit|}">Edit</a>

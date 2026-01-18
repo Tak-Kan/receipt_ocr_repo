@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Roles</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background:#f4f4f4; }
+    form.inline { display:inline; }
+    .msg { color: green; margin-bottom: 8px; }
+    .error { color: red; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h2>Roles Management</h2>
+  <p><a th:href="@{/admin/users}">Back to Users</a> | <a th:href="@{/top}">Top</a> | <a th:href="@{/logout}">Logout</a></p>
+
+  <div th:if="${msg}" class="msg" th:utext="${msg == 'created' ? 'Role created' : (msg == 'deleted' ? 'Role deleted' : (msg == 'invalid' ? 'Invalid request' : msg))}"></div>
+
+  <h3>Existing roles</h3>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      <tr th:each="r : ${roles}">
+        <td th:text="${r.id}">1</td>
+        <td th:text="${r.name}">USER</td>
+        <td>
+          <form th:action="@{|/admin/roles/${r.id}/delete|}" method="post" class="inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" onclick="return confirm('Delete role?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Create role</h3>
+  <div th:if="${#lists.isEmpty(availableNames)}">
+    <p>All RoleName values are already present.</p>
+  </div>
+  <div th:if="${!#lists.isEmpty(availableNames)}">
+    <form th:action="@{/admin/roles}" method="post">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      <label>Select role to create</label>
+      <select name="roleName">
+        <option th:each="rn : ${availableNames}" th:value="${rn.name()}" th:text="${rn.name()}"></option>
+      </select>
+      <button type="submit">Create</button>
+    </form>
+  </div>
+</body>
+</html>
