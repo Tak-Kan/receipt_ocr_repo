@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "app_user")
@@ -16,11 +17,16 @@ public class AppUser {
     @Column(nullable = false, length = 200)
     private String password;
 
-    @Column(length = 200)
-    private String roles; // comma separated roles, e.g. "ROLE_USER,ROLE_ADMIN"
-
     @Column(nullable = false)
     private boolean enabled = true;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "app_user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
 
     // getters / setters
     public Long getId() { return id; }
@@ -32,9 +38,9 @@ public class AppUser {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getRoles() { return roles; }
-    public void setRoles(String roles) { this.roles = roles; }
-
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public Set<Role> getRoles() { return roles; }
+    public void setRoles(Set<Role> roles) { this.roles = roles; }
 }

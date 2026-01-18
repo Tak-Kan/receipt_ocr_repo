@@ -1,13 +1,16 @@
 package com.example.demo.service;
 
 import com.example.demo.model.AppUser;
+import com.example.demo.model.Role;
+import com.example.demo.model.RoleName;
+import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -16,15 +19,32 @@ public class UserService {
     private UserRepository repo;
 
     @Autowired
+    private RoleRepository roleRepo;
+
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    public AppUser createUser(String username, String rawPassword, String roles) {
+    public AppUser createUser(String username, String rawPassword, Set<RoleName> roleNames) {
         AppUser u = new AppUser();
         u.setUsername(username);
         u.setPassword(passwordEncoder.encode(rawPassword));
-        u.setRoles(roles);
         u.setEnabled(true);
+        u.setRoles(resolveRoles(roleNames));
         return repo.save(u);
+    }
+
+    public Set<Role> resolveRoles(Set<RoleName> roleNames) {
+        if (roleNames == null || roleNames.isEmpty()) {
+            roleNames = Set.of(RoleName.USER);
+        }
+        return roleNames.stream()
+                .map(rn -> roleRepo.findByName(rn)
+                        .orElseGet(() -> {
+                            Role r = new Role();
+                            r.setName(rn);
+                            return roleRepo.save(r);
+                        }))
+                .collect(Collectors.toSet());
     }
 
     public Optional<AppUser> findByUsername(String username) {

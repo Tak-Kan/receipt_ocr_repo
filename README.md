@@ -28,7 +28,7 @@
    - Backend:  http://localhost:5000/api/users
    - MySQL: (ホスト) localhost:3306（必要であれば MySQL クライアントで接続）
 
-## 実行手順
+## ログイン実行手順
 1. ローカル実行:
    - cd frontend
    - mvn spring-boot:run
@@ -45,6 +45,16 @@
    - 認証成功 -> /top にリダイレクト（HomeController が表示）
    - /top は認証が必要（未認証なら /login にリダイレクト）
    - /logout でログアウトし /login?logout に遷移
+
+
+
+## 管理画面使い方メモ：
+
+   - 管理画面は /admin/users、編集画面は /admin/users/{id}/edit。
+      - ブラウザで http://localhost:8080/admin/users
+      - ブラウザで http://localhost:8080/admin/users/{id}/edit
+   - 初期ユーザ（DemoApplication の初期化）で admin/adminpass が作られるので、まず admin でログインして /admin/users を開いてください。
+   - 新規登録は /register から実行。登録後は /login?registered にリダイレクトされます。
 
 ### 注意点
 - WSL2 で Docker を使う際は、プロジェクトを Windows 側のファイルシステム（C:\...）に置くとファイル I/O が遅くなることがあるため、できれば WSL のホーム下に置くことを推奨します。

@@ -8,6 +8,7 @@
     label { display:block; margin-top:8px; }
     input[type="text"] { width:100%; padding:8px; margin-top:4px; box-sizing:border-box; }
     button { margin-top:12px; padding:6px 10px; }
+    .roles { margin-top:8px; }
   </style>
 </head>
 <body>
@@ -19,8 +20,16 @@
     <label>Username</label>
     <input type="text" th:value="${user.username}" readonly />
 
-    <label>Roles (comma separated, e.g. ROLE_USER,ROLE_ADMIN)</label>
-    <input type="text" name="roles" th:value="${user.roles}" />
+    <div class="roles">
+      <label>Roles</label>
+      <div th:each="r : ${allRoles}">
+        <label>
+          <input type="checkbox" name="roles" th:value="${r.id}"
+                 th:checked="${assignedRoleIds.contains(r.id)}" />
+          <span th:text="${r.name}">ROLE</span>
+        </label>
+      </div>
+    </div>
 
     <label><input type="checkbox" name="enabled" th:checked="${user.enabled}"/> Enabled</label>
 
