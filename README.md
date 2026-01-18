@@ -51,3 +51,24 @@
    docker run --rm -it mysql:8.0 mysql -h 192.168.11.26 -P 3307 -u testuser -p python_schema
    ```
 
+
+
+使い方・確認手順
+
+上記ファイルを frontend プロジェクトに追加または置換してください。
+ローカルで確認する場合:
+cd frontend
+mvn spring-boot:run
+ブラウザで http://localhost:8080/login にアクセス
+Docker 経由で実行する場合:
+docker compose build frontend
+docker compose up -d frontend
+ブラウザで http://localhost:8080/login にアクセス
+ログイン画面で認証後、/top に遷移することを確認してください。ログアウトは /logout。
+注意（セキュリティ）
+
+本サンプルは学習目的で簡易実装です。実運用では次を検討してください：
+Spring Security の導入（認証・認可・CSRF 対策）
+HTTPS（TLS）
+パスワードのハッシュ化、データベースでのユーザ管理
+セッション固定攻撃やセッションタイムアウト設定
