@@ -13,7 +13,6 @@ public class AuthController {
     private static final String SESSION_USER_KEY = "user";
 
     // show login form
-    @GetMapping({"/", "/login"})
     public String loginForm(HttpServletRequest req, Model model) {
         HttpSession session = req.getSession(false);
         if (session != null && session.getAttribute(SESSION_USER_KEY) != null) {
@@ -24,7 +23,6 @@ public class AuthController {
     }
 
     // handle login submit
-    @PostMapping("/login")
     public String doLogin(HttpServletRequest req, Model model) {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
@@ -54,7 +52,6 @@ public class AuthController {
     }
 
     // top page (requires login)
-    @GetMapping("/top")
     public String top(HttpServletRequest req, Model model) {
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute(SESSION_USER_KEY) == null) {

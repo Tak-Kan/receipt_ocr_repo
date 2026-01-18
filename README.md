@@ -19,10 +19,32 @@
    ```bash
    docker compose up --build
    ```
+   - キャッシュクリアで実行する場合は以下を実行：
+   ```bash
+   docker compose build --no-cache frontend
+   ```
 4. ブラウザまたは curl で確認:
    - Frontend: http://localhost:8080/hello
    - Backend:  http://localhost:5000/api/users
    - MySQL: (ホスト) localhost:3306（必要であれば MySQL クライアントで接続）
+
+## 実行手順
+1. ローカル実行:
+   - cd frontend
+   - mvn spring-boot:run
+   - ブラウザで http://localhost:8080/login にアクセス。初期ユーザは user / password。
+2. Docker 実行（compose を使う場合）:
+   - docker compose build --no-cache frontend
+   - docker compose up -d frontend
+   - ブラウザで http://localhost:8080/login
+
+---- 動作の流れ ----
+
+   - ユーザが /login にアクセス -> login.html を表示
+   - フォーム送信は /login (POST) に対して Spring Security が処理（CustomUserDetailsService が DB からユーザを読み込み、BCrypt でパスワードを比較）
+   - 認証成功 -> /top にリダイレクト（HomeController が表示）
+   - /top は認証が必要（未認証なら /login にリダイレクト）
+   - /logout でログアウトし /login?logout に遷移
 
 ### 注意点
 - WSL2 で Docker を使う際は、プロジェクトを Windows 側のファイルシステム（C:\...）に置くとファイル I/O が遅くなることがあるため、できれば WSL のホーム下に置くことを推奨します。
