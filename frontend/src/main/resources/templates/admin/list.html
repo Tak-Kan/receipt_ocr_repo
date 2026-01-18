@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Users</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background:#f4f4f4; }
+    .actions form { display:inline; }
+  </style>
+</head>
+<body>
+  <h2>Users</h2>
+  <p><a th:href="@{/top}">Back to Top</a> | <a th:href="@{/logout}">Logout</a></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Username</th><th>Roles</th><th>Enabled</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="u : ${users}">
+        <td th:text="${u.id}">1</td>
+        <td th:text="${u.username}">user</td>
+        <td th:text="${u.roles}">ROLE_USER</td>
+        <td th:text="${u.enabled}">true</td>
+        <td class="actions">
+          <a th:href="@{|/admin/users/${u.id}/edit|}">Edit</a>
+          <form th:action="@{|/admin/users/${u.id}/delete|}" method="post" th:object="${u}" style="display:inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" onclick="return confirm('Delete this user?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

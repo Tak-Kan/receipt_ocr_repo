@@ -15,7 +15,7 @@ public class DemoApplication {
     SpringApplication.run(DemoApplication.class, args);
   }
 
-  // 初期ユーザを作成（存在しない場合）
+  // 初期ユーザを作成（存在しない場合）: 一般ユーザ + 管理者
   @Bean
   CommandLineRunner initUsers(UserRepository repo, BCryptPasswordEncoder passwordEncoder) {
     return args -> {
@@ -26,7 +26,15 @@ public class DemoApplication {
         u.setRoles("ROLE_USER");
         u.setEnabled(true);
         repo.save(u);
-        System.out.println("Created default user: user / password");
+
+        AppUser admin = new AppUser();
+        admin.setUsername("admin");
+        admin.setPassword(passwordEncoder.encode("adminpass"));
+        admin.setRoles("ROLE_ADMIN,ROLE_USER");
+        admin.setEnabled(true);
+        repo.save(admin);
+
+        System.out.println("Created default users: user/password and admin/adminpass");
       }
     };
   }
