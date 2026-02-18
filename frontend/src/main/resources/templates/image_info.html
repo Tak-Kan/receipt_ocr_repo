@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <title>Image_Info</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .header { display:flex; justify-content:space-between; align-items:center; }
+    .container { max-width: 720px; margin:auto; }
+    .preview { margin-top: 12px; }
+    .info-area { display:flex; justify-content:space-between; align-items:top; }
+    .left-area { align-items:left; }
+    .right-area { align-items:right; }
+    img.preview-img { max-width: 100%; max-height: 360px; border:1px solid #ddd; padding:4px; }
+    .meta { margin-top:8px; color:#333; }
+    .error { color: #b00020; }
+    .ok { color: #2e7d32; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="banner">
+      <img src="@{/images/logo.jpg}" alt="ロゴ" width="193" height="130">
+    </div>
+    
+    <h2 style="text-align:center">家計簿管理システム</h2>
+
+    <div class="header">
+      <h2>取込内容確認画面</h2>
+      <div>
+        <span th:text="'ユーザーID： ' + ${username}">Hello, user!</span>
+        &nbsp;|&nbsp;
+        <a th:href="@{/logout}">ログアウト</a>
+      </div>
+    </div>
+
+    <div th:if="${error}" class="error" th:text="${error}"></div>
+    <div th:if="${success}" class="ok" th:text="${success}"></div>
+
+    <form th:action="@{/image/update}" method="post" enctype="multipart/form-data">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+      <div class="info-area">
+        <div id="left-area">
+          <p>取込画像：</p>
+          <p>選択されたファイル名: <span id="filename">（未選択）</span></p>
+          <img th:src="@{|/image/${uploadedId}|}" alt="uploaded" style="max-width:400px; border:1px solid #ddd; padding:4px;"/>
+        </div>
+        <div id="right-area">
+          <table>
+            <tr>
+              <td><p>購入日時：</p></td>
+              <td>
+                <input type="text" placeholder="YYYY/MM/DD" />
+              </td>
+              <td>
+                <input type="text" placeholder="HH:mm" />
+              </td>
+            </tr>
+            
+            <tr>
+              <td><p>購入店舗：</p></td>
+              <td colspan="2">
+                <input type="text" placeholder="ｄｄｄ" />
+              </td>
+            </tr>
+            
+            <tr>
+              <td><p>事業者番号：</p></td>
+              <td colspan="2">
+                <input type="text" placeholder="TXXXXXXXXX" />
+              </td>
+            </tr>
+          </table>
+
+          <p>購入品明細：</p>
+          
+          <table>
+            <tr>
+              <th>No.</th>
+              <th>品名</th>
+              <th>金額</th>
+              <th>軽減税率対象</th>
+            </tr>
+            <tr>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div id="right-area">
+        <button type="submit" style="margin-top:12px;">登録</button>
+        <button type="button" th:onclick="|location.href='@{/top}'|">削除</button>
+        <button type="button" th:onclick="|location.href='@{/top}'|">戻る</button>
+      </div>
+
+    </form>
+
+  </div>
+  <script>
+    const fileInput = document.getElementById('file');
+    const filenameSpan = document.getElementById('filename');
+    const previewImg = document.getElementById('preview-img');
+
+    fileInput.addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) {
+        filenameSpan.textContent = '（未選択）';
+        filepathSpan.textContent = '（取得不可）';
+        previewArea.style.display = 'none';
+        previewImg.src = '#';
+        return;
+      }
+      // filename
+      filenameSpan.textContent = f.name + ' (' + f.type + ', ' + f.size + ' bytes)';
+
+      // プレビュー（FileReader）
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        previewImg.src = evt.target.result;
+      };
+      reader.readAsDataURL(f);
+    });
+  </script>
+</body>
+</html>

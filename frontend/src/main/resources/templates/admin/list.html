@@ -5,6 +5,7 @@
   <title>Admin - Users</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
+    .header { display:flex; justify-content:space-between; align-items:center; }
     table { width:100%; border-collapse: collapse; }
     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
     th { background:#f4f4f4; }
@@ -12,17 +13,27 @@
   </style>
 </head>
 <body>
-  <h2>Users</h2>
-  <p>
-    <a th:href="@{/top}">Back to Top</a> |
-    <a th:href="@{/admin/roles}">Manage Roles</a> |
-    <a th:href="@{/logout}">Logout</a>
-  </p>
+  <div class="banner">
+    <img src="@{/images/logo.jpg}" alt="ロゴ" width="193" height="130">
+  </div>
+    
+  <h2>家計簿管理システム</h2>
+
+  <div class="header">
+    <h2>ユーザー管理画面</h2>
+    <div>
+      <p>
+        <a th:href="@{/top}">Back to Top</a> |
+        <a th:href="@{/admin/roles}">Manage Roles</a> |
+        <a th:href="@{/logout}">Logout</a>
+      </p>
+    </div>
+  </div>
 
   <table>
     <thead>
       <tr>
-        <th>ID</th><th>Username</th><th>Roles</th><th>Enabled</th><th>Actions</th>
+        <th>ID</th><th>ユーザー名</th><th>権限</th><th>有効</th><th>操作</th>
       </tr>
     </thead>
     <tbody>

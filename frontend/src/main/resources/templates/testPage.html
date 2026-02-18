@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    .container { max-width: 360px; margin: auto; }
+    .error { color: red; margin-bottom: 12px; }
+    label { display:block; margin-top:8px; }
+    input[type="text"], input[type="password"] { width:100%; padding:8px; margin-top:4px; box-sizing:border-box; }
+    button { margin-top:12px; padding:8px 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="banner">
+      <img src="@{/images/logo.jpg}" alt="ロゴ" width="193" height="130">
+    </div>
+    
+    <h2 style="text-align:center">家計簿管理システム</h2>
+
+    <h2 style="text-align:center">テストページ</h2>
+
+    <div th:if="${error}" class="error" th:text="${error}"></div>
+    <div th:if="${success}" class="ok" th:text="${success}"></div>
+
+    <!--<form th:action="@{/image/update}" method="post" enctype="multipart/form-data">-->
+    <form enctype="multipart/form-data">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+      <div class="info-area">
+        <div id="left-area">
+          <select id="import-pattarn">
+            <option value="1">画像プレビュー</option>
+            <option value="2">アップロード</option>
+          </select>
+
+          <div id="previewDiv" style="display: none;">
+            <!-- 方法1: プレビュー機能付き -->
+            <h2>方法1: 画像プレビュー（JavaScriptで即表示）</h2>
+            <form>
+                <label for="fileInput">画像ファイルを選択:</label>
+                <input type="file" id="fileInput" accept="image/*">
+                <p style="font-size: 12px; color: #666;">対応形式: JPG, PNG, GIF, WebP など</p>
+            </form>
+            
+            <div id="preview">
+                <img id="previewImage" alt="プレビュー画像">
+            </div>
+            <div id="message"></div>
+          </div>
+
+          <div id="uploadDiv" style="display: none;">
+            <!-- 方法2: サーバーにアップロード -->
+            <h2>方法2: サーバーにアップロード</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <label for="fileInput2">画像ファイルを選択:</label>
+                <input type="file" id="fileInput2" name="file" accept="image/*" required>
+                <br><br>
+                <button type="submit">アップロード</button>
+            </form>
+            <div id="uploadMessage"></div>
+          </div>
+
+        </div>
+
+        <div id="right-area">
+          <table>
+            <tr>
+              <td><p>購入日時：</p></td>
+              <td>
+                <input type="text" placeholder="YYYY/MM/DD" />
+              </td>
+              <td>
+                <input type="text" placeholder="HH:mm" />
+              </td>
+            </tr>
+            
+            <tr>
+              <td><p>購入店舗：</p></td>
+              <td colspan="2">
+                <input type="text" placeholder="ｄｄｄ" />
+              </td>
+            </tr>
+            
+            <tr>
+              <td><p>事業者番号：</p></td>
+              <td colspan="2">
+                <input type="text" placeholder="TXXXXXXXXX" />
+              </td>
+            </tr>
+          </table>
+
+          <p>購入品明細：</p>
+          
+          <table>
+            <tr>
+              <th>No.</th>
+              <th>品名</th>
+              <th>金額</th>
+              <th>軽減税率対象</th>
+            </tr>
+            <tr>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+              <td>
+                <input type="text" />
+              </td>
+            </tr>
+          </table>
+        </div>
+
+      </div>
+    </form>
+
+    <p style="margin-top:16px; color:#666;">
+      登録後はログインページに戻ります。
+      After registration you'll be redirected to the login page.
+    </p>
+  </div>
+    <script>
+        // 方法1: ローカルプレビュー（JavaScriptのFile APIを使用）
+        document.getElementById('import-pattarn').addEventListener('change', function(event) {
+            var selectedValue = document.getElementById('import-pattarn').value;
+            const previewDiv = document.getElementById('previewDiv');
+            const uploadDiv = document.getElementById('uploadDiv');
+            
+            if (selectedValue == '1') {
+                previewDiv.style.display = 'block';
+                uploadDiv.style.display = 'none';
+            } else {
+                previewDiv.style.display = 'none';
+                uploadDiv.style.display = 'block';
+            }
+        });
+        // 方法1: ローカルプレビュー（JavaScriptのFile APIを使用）
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            
+            if (file) {
+                // ファイル型チェック
+                if (!file.type.startsWith('image/')) {
+                    document.getElementById('message').innerHTML = 
+                        '<p class="error">画像ファイルを選択してください。</p>';
+                    return;
+                }
+
+                // ファイルサイズチェック（5MB以下）
+                const maxSize = 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    document.getElementById('message').innerHTML = 
+                        '<p class="error">ファイルサイズが大きすぎます（5MB以下）。</p>';
+                    return;
+                }
+
+                // 画像をプレビュー表示
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewImage = document.getElementById('previewImage');
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    document.getElementById('message').innerHTML = 
+                        '<p class="success">ファイル: ' + file.name + '</p>';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 方法2: サーバーにアップロード
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(this);
+            const fileInput = document.getElementById('fileInput2');
+            
+            if (!fileInput.files[0]) {
+                document.getElementById('uploadMessage').innerHTML = 
+                    '<p class="error">ファイルを選択してください。</p>';
+                return;
+            }
+
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('uploadMessage').innerHTML = 
+                        '<p class="success">' + data.message + '</p>' +
+                        '<img src="' + data.imagePath + '" alt="アップロード画像" style="max-width: 100%; margin-top: 10px;">';
+                } else {
+                    document.getElementById('uploadMessage').innerHTML = 
+                        '<p class="error">エラー: ' + data.message + '</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('uploadMessage').innerHTML = 
+                    '<p class="error">通信エラー: ' + error + '</p>';
+            });
+        });
+    </script>
+</body>
+</html>

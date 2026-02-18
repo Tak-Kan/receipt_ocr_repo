@@ -14,25 +14,35 @@
 </head>
 <body>
   <div class="container">
-    <h2>Login</h2>
+    <div class="banner">
+      <img src="@{/images/logo.jpg}" alt="ロゴ" width="193" height="130">
+    </div>
+    
+    <h2 style="text-align:center">家計簿管理システム</h2>
+
+    <h2 style="text-align:center">ログイン</h2>
 
     <div th:if="${param.error}" class="error">Invalid username or password</div>
     <div th:if="${param.logout}" style="color:green; margin-bottom:12px;">You have been logged out</div>
 
     <form th:action="@{/login}" method="post">
       <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-      <label for="username">Username</label>
+      <label for="username">ユーザーID：</label>
       <input id="username" name="username" type="text" autofocus />
 
-      <label for="password">Password</label>
+      <label for="password">パスワード：</label>
       <input id="password" name="password" type="password" />
 
-      <button type="submit">Login</button>
+      <button type="submit">ログイン</button>
     </form>
 
     <p style="margin-top:16px; color:#666;">
       初期ユーザ: <strong>user</strong> / <strong>password</strong>
     </p>
+
+    <div>ユーザーの新規作成は<a th:href="@{/register}">こちら</a></div>
+    <div>※パスワードを忘れた場合は、システム管理者へご連絡ください。</div>
+    
   </div>
 </body>
 </html>
