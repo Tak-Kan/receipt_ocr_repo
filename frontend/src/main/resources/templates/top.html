@@ -31,6 +31,11 @@
     <button type="button" th:onclick="|location.href='@{/image/upload}'|">
       画像取込
     </button>
+    
+    <!-- 画像取込ボタン（クリックで /image/entry へ） -->
+    <button type="button" th:onclick="|location.href='@{/receipt/upload}'|">
+      receipt
+    </button>
 
     <form th:action="@{/login}" method="post">
       <button type="submit" disabled>登録内容検索</button>

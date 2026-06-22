@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>読み取り結果確認（画面2）</title>
+</head>
+<body>
+    <h2>読み取り結果の確認と編集</h2>
+    
+    <form th:action="@{/receipt/save}" method="post">
+        <div>
+            <label>購入店舗：</label>
+            <input type="text" name="storeName" th:value="${analyzedData.merchant_name}">
+        </div>
+        <div>
+            <label>日付：</label>
+            <input type="text" name="date" th:value="${analyzedData.date}">
+            <label>時刻：</label>
+            <input type="text" name="time" th:value="${analyzedData.time}">
+        </div>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品名</th>
+                        <th>価格 (円)</th>
+                    </tr>
+                </thead>
+                <tbody id="data-container">
+                    <tr th:each="item : ${analyzedData.items}">
+                        <td th:text="${item.name}"></td>
+                        <td th:text="${item.price}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <label>金額：</label>
+            <input type="text" name="amount" th:value="${analyzedData.total_amount}">
+        </div>
+        
+        <button type="submit">登録</button>
+    </form>
+</body>
+</html>

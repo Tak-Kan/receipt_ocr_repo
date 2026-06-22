@@ -13,6 +13,8 @@ services:
       - DB_NAME=python_schema
       - DB_USER=testuser
       - DB_PASS=testP@ssw0rd
+      - AZURE_DOC_INTEL_ENDPOINT=https://takumi-di-instance.cognitiveservices.azure.com/
+      - AZURE_DOC_INTEL_KEY=EsW9z5cW4iMOo3XDnS1F7NrTe63RkpQz6TzWhT830HucBihHnlJ1JQQJ99CFACxCCsyXJ3w3AAALACOG3Hoa
     ports:
       - "5000:5000"
     networks:
@@ -29,6 +31,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mariadb://192.168.11.26:3307/python_schema
       - SPRING_DATASOURCE_USERNAME=testuser
       - SPRING_DATASOURCE_PASSWORD=testP@ssw0rd
+      - BACKEND_API_URL=http://backend:5000/api
     ports:
       - "8080:8080"
     networks:
