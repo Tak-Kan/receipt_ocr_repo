@@ -10,12 +10,14 @@ Example SQLAlchemy URL:
 import os
 import time
 import logging
+from datetime import datetime
 from urllib.parse import quote_plus
 
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import declarative_base, sessionmaker
 import json
 # クラウドSDK
 import boto3
@@ -58,9 +60,6 @@ def wait_for_db(uri: str, max_retries: int = 10, delay: int = 3, timeout: int = 
                 conn.execute(text("SELECT 1"))
             logger.info("DB connection successful on attempt %d", attempt)
             return True
-        except OperationalError as e:
-            logger.warning("DB connect attempt %d/%d failed: %s", attempt, max_retries, e)
-            time.sleep(delay)
         except Exception as e:
             logger.exception("Unexpected error when testing DB connection: %s", e)
             time.sleep(delay)
@@ -81,6 +80,33 @@ app.config.setdefault("SQLALCHEMY_ENGINE_OPTIONS", {"pool_pre_ping": True, "pool
 db = SQLAlchemy(app)
 
 
+def create_session(uri: str, max_retries: int = 10, delay: int = 3, timeout: int = 5) -> bool:
+    """
+    Try connecting to the database repeatedly until success or retries exhausted.
+    Returns True if reachable, False otherwise.
+    """
+    logger.info("Testing DB connection to: %s", uri)
+    attempt = 0
+    while attempt < max_retries:
+        attempt += 1
+        try:
+            # create a short-lived engine for the check
+            engine = create_engine(uri, connect_args={"connect_timeout": timeout}, pool_pre_ping=True)
+            with engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            logger.info("DB connection successful on attempt %d", attempt)
+            return sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        except Exception as e:
+            logger.exception("Unexpected error when testing DB connection: %s", e)
+            time.sleep(delay)
+    logger.error("Could not connect to DB after %d attempts", max_retries)
+    return False
+
+# セッションを生成するためのファクトリ（sessionmaker）を作成
+if db_ready:
+    SessionLocal = create_session(DATABASE_URL, max_retries=MAX_RETRIES, delay=RETRY_DELAY, timeout=CONNECT_TIMEOUT)
+
+
 # simple model for the sample users table
 class User(db.Model):
     __tablename__ = "users"
@@ -88,6 +114,20 @@ class User(db.Model):
     name = db.Column(db.String(100))
     email = db.Column(db.String(150))
     created_at = db.Column(db.DateTime)
+
+# 家計簿情報テーブル
+class Account(db.Model):
+    __tablename__ = "T_ACCOUNT"
+    account_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    store_name = db.Column(db.String(100))
+    purchase_datetime = db.Column(db.DateTime)
+    total_amount = db.Column(db.Integer)
+    entry_datetime = db.Column(db.DateTime)
+    entry_user = db.Column(db.String(10))
+    update_datetime = db.Column(db.DateTime, nullable=True)
+    update_user = db.Column(db.String(10), nullable=True)
+    
+
 
 @app.route("/health")
 def health():
@@ -236,6 +276,28 @@ def save_receipt():
     # 【実装ポイント】
     # ここで SQLAlchemy などのORMを利用して、MariaDBへINSERTします。
     # ---------------------------------------------------------
+    # セッションのインスタンスを作成
+    session = SessionLocal()
+    try:
+        # 挿入したいデータのインスタンスを作成
+        new_account = Account(store_name=data.get("storeName"),entry_datetime=datetime.now(),entry_user="test")
+        
+        # セッションに追加
+        session.add(new_account)
+        
+        # コミットして確定
+        session.commit()
+        print(f"データが正常に挿入されました: {new_account}")
+        
+    except Exception as e:
+        # エラー時はロールバック
+        session.rollback()
+        print(f"エラーが発生しました: {e}")
+        
+    finally:
+        # 1.x系では最後に明示的にセッションを閉じるのが一般的です
+        session.close()
+
     print(f"DB保存処理を実行しました: {data}")
     
     return jsonify({"status": "success", "message": "登録が完了しました"}), 201

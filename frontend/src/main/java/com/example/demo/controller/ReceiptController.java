@@ -12,8 +12,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Base64; // 追加
 import java.util.Map;
-import java.util.List;
 
 @Controller
 @RequestMapping("/receipt")
@@ -28,13 +28,18 @@ public class ReceiptController {
     // 画面1: 画像指定画面の表示
     @GetMapping("/upload")
     public String showUploadScreen() {
-        return "screen1";
+        return "hams_entry";
     }
 
     // 画面1: 画像送信処理
     @PostMapping("/analyze")
     public String analyzeImage(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
         try {
+            // 【追加】画像をBase64文字列に変換して次の画面に引き継ぐ
+            String base64Image = Base64.getEncoder().encodeToString(file.getBytes());
+            redirectAttributes.addFlashAttribute("imageBase64", base64Image);
+            redirectAttributes.addFlashAttribute("imageType", file.getContentType()); // image/jpeg 等
+
             // FlaskAPIへファイルを送信するための準備
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -67,7 +72,7 @@ public class ReceiptController {
         if (!model.containsAttribute("analyzedData")) {
             return "redirect:/receipt/upload";
         }
-        return "screen2";
+        return "hams_confirm";
     }
 
     // 画面2: 登録処理
