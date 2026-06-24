@@ -19,7 +19,7 @@ public class AuthController {
             // already logged in -> redirect to top
             return "redirect:/top";
         }
-        return "login";
+        return "hams_login";
     }
 
     // handle login submit
@@ -41,7 +41,7 @@ public class AuthController {
 
         if (!valid) {
             model.addAttribute("error", "Invalid username or password");
-            return "login";
+            return "hams_login";
         }
 
         // create session and store user info
@@ -59,7 +59,7 @@ public class AuthController {
         }
         String username = (String) session.getAttribute(SESSION_USER_KEY);
         model.addAttribute("username", username);
-        return "top";
+        return "hams_top";
     }
 
     // logout

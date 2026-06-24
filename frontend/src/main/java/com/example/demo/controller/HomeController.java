@@ -13,13 +13,13 @@ public class HomeController {
         if (auth != null && auth.isAuthenticated()) {
             return "redirect:/top";
         }
-        return "login";
+        return "hams_login";
     }
 
     @GetMapping("/top")
     public String topPage(Authentication auth, Model model) {
         String username = (auth != null) ? auth.getName() : "anonymous";
         model.addAttribute("username", username);
-        return "top";
+        return "hams_top";
     }
 }

@@ -79,6 +79,20 @@ app.config.setdefault("SQLALCHEMY_ENGINE_OPTIONS", {"pool_pre_ping": True, "pool
 
 db = SQLAlchemy(app)
 
+def convert_datetime(date: str, time: str) -> datetime:
+    # 2. 日付と時間を結合して1つの文字列にする
+    # 例: "2026年01月01日 12:34"
+    combined_str = f"{date} {time}"
+
+    # 3. 文字列をPythonのdatetimeオブジェクトに変換する
+    # %Y: 4桁の年, %m: 0埋めの月, %d: 0埋めの日, %H: 24時間表記の時, %M: 分
+    dt_obj = datetime.strptime(combined_str, "%Y年%m月%d日 %H:%M")
+
+    # 4. MySQLのDATETIME型用のフォーマット（YYYY-MM-DD HH:MM:SS）に変換する
+    # %S: 秒（元のデータに秒がない場合は 00 になります）
+    mysql_datetime_str = dt_obj.strftime("%Y-%m-%d %H:%M:%S")
+
+    return mysql_datetime_str
 
 def create_session(uri: str, max_retries: int = 10, delay: int = 3, timeout: int = 5) -> bool:
     """
@@ -279,8 +293,18 @@ def save_receipt():
     # セッションのインスタンスを作成
     session = SessionLocal()
     try:
+        # 購入日時の文字列を取得
+        param_datetime = convert_datetime(data.get("date"), data.get("time"))
+
+        # 合計金額の文字列を取得（キーが存在しない場合は "0" をデフォルトにする）
+        amount_str = data.get("total_amount", "0")
+        # replace()を使って「\」「¥」「,」を空文字に置換（削除）する
+        cleaned_str = amount_str.replace("\\", "").replace("¥", "").replace(",", "")
+        # 整数（int）に変換
+        param_total_amount = int(cleaned_str)
+
         # 挿入したいデータのインスタンスを作成
-        new_account = Account(store_name=data.get("storeName"),entry_datetime=datetime.now(),entry_user="test")
+        new_account = Account(store_name=data.get("storeName"), purchase_datetime=param_datetime, total_amount=param_total_amount,entry_datetime=datetime.now(),entry_user="test")
         
         # セッションに追加
         session.add(new_account)

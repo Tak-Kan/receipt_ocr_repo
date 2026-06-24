@@ -19,7 +19,7 @@ public class RegisterController {
 
     @GetMapping("/register")
     public String showForm() {
-        return "register";
+        return "hams_user_register";
     }
 
     @PostMapping("/register")
@@ -30,15 +30,15 @@ public class RegisterController {
 
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
             model.addAttribute("error", "Username and password are required");
-            return "register";
+            return "hams_user_register";
         }
         if (!password.equals(password2)) {
             model.addAttribute("error", "Passwords do not match");
-            return "register";
+            return "hams_user_register";
         }
         if (userService.findByUsername(username).isPresent()) {
             model.addAttribute("error", "Username already exists");
-            return "register";
+            return "hams_user_register";
         }
 
         // default role: ROLE_USER
