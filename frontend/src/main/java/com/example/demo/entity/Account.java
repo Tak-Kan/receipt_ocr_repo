@@ -26,6 +26,9 @@ public class Account {
     @Column(name = "total_amount")
     private Integer totalAmount;
 
+    @Column(name = "image_path")
+    private String imagePath;
+
     @Column(name = "entry_datetime")
     private LocalDateTime entryDatetime;
 

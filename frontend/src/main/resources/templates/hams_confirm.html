@@ -38,10 +38,7 @@
                     </div>
                     <div class="card-body">
                         <div class="receipt-image-container">
-                            <img th:if="${imageBase64 != null}" 
-                                 th:src="@{'data:' + ${imageType} + ';base64,' + ${imageBase64}}" 
-                                 alt="レシート画像" />
-                            <p th:if="${imageBase64 == null}" class="text-muted">画像がありません</p>
+                            <img th:src="@{${accountForm.receiptImagePath}}" alt="アップロードされたレシート" class="receipt-image"/>
                         </div>
                     </div>
                 </div>
@@ -54,7 +51,8 @@
                     </div>
                     <div class="card-body">
                         <form th:action="@{/account/register}" th:object="${accountForm}" method="post">
-                            <input type="text" th:field="*{accountId}" />
+                            <input type="hidden" th:field="*{accountId}" />
+                            <input type="text" th:field="*{receiptImagePath}" />
 
                             <div class="form-group mb-3">
                                 <label for="purchaseDatetime">購入日時：</label>

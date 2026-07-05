@@ -16,6 +16,7 @@ public interface AccountMapper {
     @Mapping(target = "accountId", ignore = true) // DBで自動生成されるため無視
     @Mapping(target = "entryUser", ignore = true)    // コントローラー/サービスでセットするため無視
     @Mapping(target = "purchaseDatetime", dateFormat = "yyyy-MM-dd'T'HH:mm")
+    @Mapping(target = "imagePath", source = "receiptImagePath")
     Account toEntity(AccountForm form);
 
     @Mapping(target = "detailNumber", ignore = true)

@@ -36,6 +36,9 @@ services:
       - "8080:8080"
     networks:
       - sample-network
+    volumes:
+      # 左側がWSL2(NAS)のパス、右側がコンテナ(Spring Boot)内のパス
+      - /mnt/nas/hams_uploads:/app/uploads
 
 volumes:
   db-data:
