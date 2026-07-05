@@ -1,7 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.TAccount;
-import com.example.demo.repository.TAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,9 +30,6 @@ public class ReceiptController {
     //@Value("${BACKEND_API_URL:http://backend:5000/api}")
     //private final String BACKEND_URL;
     private final RestTemplate restTemplate = new RestTemplate();
-
-    @Autowired
-    private TAccountRepository tAccountRepository; // Repositoryをインジェクション
 
     // 画面1: 画像指定画面の表示
     @GetMapping("/upload")
@@ -84,47 +79,6 @@ public class ReceiptController {
             return "redirect:/receipt/upload";
         }
         return "hams_confirm";
-    }
-
-    // 画面2: 登録処理
-    @PostMapping("/save")
-    public String saveReceipt(@RequestParam("storeName") String storeName,
-                              @RequestParam("date") String dateStr,
-                              @RequestParam("time") String timeStr,
-                              @RequestParam("amount") Integer amount) {
-
-    
-        TAccount taccount = new TAccount();
-        
-        // ★ 日付と時刻を結合して LocalDateTime に変換する処理 ★
-        if (dateStr != null && !dateStr.isEmpty() && timeStr != null && !timeStr.isEmpty()) {
-            // パターンを指定してフォーマッターを作成
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
-            // "2026-06-24" を LocalDate に
-            LocalDate date = LocalDate.parse(dateStr, dateFormatter);
-            // "15:30" を LocalTime に
-            LocalTime time = LocalTime.parse(timeStr);
-            // ２つを結合して LocalDateTime (2026-06-24T15:30) に
-            LocalDateTime dateTime = LocalDateTime.of(date, time);
-            
-            taccount.setPurchaseDatetime(dateTime);
-        }
-
-        LocalDateTime now = LocalDateTime.now();
-        taccount.setStoreName(storeName);
-        taccount.setTotalAmount(amount);
-        taccount.setEntryDatetime(now);
-        taccount.setEntryUser("testuser");
-
-        // DBに保存
-        tAccountRepository.save(taccount);
-
-        // restTemplate.postForEntity(BACKEND_URL + "/receipts", requestEntity, Map.class);
-        
-        // 登録完了後、とりあえず画面1に戻す（実際は一覧画面等へ）
-        // return "redirect:/receipt/search";
-        // 登録完了後、とりあえず画面1に戻す（実際は一覧画面等へ）
-        return "redirect:/receipt/upload?success";
     }
 
 }

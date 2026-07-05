@@ -18,7 +18,6 @@
                 max-width: 100%;
                 height: auto;
             }
-            .form-group { margin-bottom: 15px; }
     </style>
 </head>
 <body class="bg-light">
@@ -30,7 +29,6 @@
 
     <div class="container-fluid px-4">
         <div class="row">
-            
             <div class="col-md-6 mb-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-secondary text-white">
@@ -53,57 +51,46 @@
                         <h5 class="mb-0">読み取り結果の確認・編集</h5>
                     </div>
                     <div class="card-body">
-                        <form th:action="@{/account/register}" th:object="${accountForm}" method="post">
-                            <input type="text" th:field="*{accountId}" />
-
-                            <div class="form-group mb-3">
-                                <label for="purchaseDatetime">購入日時：</label>
-                                <input type="datetime-local" id="purchaseDatetime" th:field="*{purchaseDatetime}" />
-                                <div th:if="${#fields.hasErrors('purchaseDatetime')}" th:errors="*{purchaseDatetime}" style="color: red;"></div>
+                        <form th:action="@{/receipt/save}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">購入日時：</label>
+                                <input type="text" class="form-control" name="date" th:value="${analyzedData.date}">
+                                <input type="text" class="form-control" name="time" th:value="${analyzedData.time}">
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label for="storeName">購入店舗：</label>
-                                <input type="text" id="storeName" th:field="*{storeName}" style="width: 300px;" />
-                                <div th:if="${#fields.hasErrors('storeName')}" th:errors="*{storeName}" style="color: red;"></div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">購入店舗</label>
+                                <input type="text" class="form-control" name="storeName" th:value="${analyzedData.merchant_name}">
                             </div>
                             
                             <div class="mb-3">
-                                <h6>購入品リスト</h6>
-                                <div th:if="${#fields.hasErrors('details')}" th:errors="*{details}" style="color: red;"></div>
-                                <table>
+                                <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>No.</th>
+                                            <th>No</th>
                                             <th>商品名</th>
-                                            <th>金額 (円)</th>
+                                            <th>価格 (円)</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr th:each="detail, stat : *{details}">
-                                            <td th:text="${stat.count}">1</td>
+                                    <tbody id="data-container">
+                                        <tr th:each="item,stat : ${analyzedData.items}">
+                                            <td th:text="${stat.count}"></td>
                                             <td>
-                                                <input type="text" th:field="*{details[__${stat.index}__].itemName}" style="width: 90%;" />
-                                                <div th:if="${#fields.hasErrors('details[__${stat.index}__].itemName')}" th:errors="*{details[__${stat.index}__].itemName}" style="color: red;"></div>
+                                                <input type="text" class="form-control" th:value="${item.name}">
                                             </td>
                                             <td>
-                                                <input type="number" th:field="*{details[__${stat.index}__].itemAmount}" style="width: 90%;" />
-                                                <div th:if="${#fields.hasErrors('details[__${stat.index}__].itemAmount')}" th:errors="*{details[__${stat.index}__].itemAmount}" style="color: red;"></div>
+                                                <input type="text" class="form-control" th:value="${item.price}">
                                             </td>
-                                        </tr>
-                                        <tr th:if="${#lists.isEmpty(accountForm.details)}">
-                                            <td colspan="3">商品データが読み取れませんでした。</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-
-                            <div class="form-group mb-4">
-                                <label for="totalAmount">合計金額 (円)：</label>
-                                <input type="number" id="totalAmount" th:field="*{totalAmount}" />
-                                <div th:if="${#fields.hasErrors('totalAmount')}" th:errors="*{totalAmount}" style="color: red;"></div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">金額 (円)</label>
+                                <input type="text" class="form-control" name="amount" th:value="${analyzedData.total_amount}">
                             </div>
-
+                            
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <a th:href="@{/receipt/upload}" class="btn btn-outline-secondary me-md-2">キャンセル</a>
                                 <button type="submit" class="btn btn-success px-5">この内容で登録</button>

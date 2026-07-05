@@ -29,7 +29,7 @@
                             レシートデータの登録が完了しました。
                         </div>
                         
-                        <form th:action="@{/account/read}" method="post" enctype="multipart/form-data" id="uploadForm">
+                        <form th:action="@{/receipt/analyze}" method="post" enctype="multipart/form-data" id="uploadForm">
                             <div class="mb-4">
                                 <label for="receiptFile" class="form-label">画像ファイルを選択してください (JPEG/PNG)</label>
                                 <input class="form-control" type="file" id="receiptFile" name="file" accept="image/*" required>
