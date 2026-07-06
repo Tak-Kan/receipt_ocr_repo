@@ -1,27 +1,61 @@
-## システム概要
-OCR機能を活用した家計簿管理システム
+【引き継ぎ用プロンプト】
 
-## 機能概要
-- ユーザーID、パスワードを使用したログイン画面
-- 画像ファイルをローカルから選択する読み取り画面
-- 読み取り画面の実行ボタン押下でOCR機能（Azure Document Intelligence）で読み取り
-- 読み取り結果を読み取り確認画面へ表示し、内容の確認・修正後にDBへ登録
-- 読み取り確認画面にはレシート画像、購入店舗、購入日時、合計金額、購入品リスト（商品名、金額）を表示
-- 登録後、トップ画面へ遷移
-- 登録内容検索画面では検索条件を入力し、DBに登録したデータを一覧表示する
-- 表示した一覧の行選択で編集画面へ遷移。（読み取り確認画面と同じレイアウト）
-- 検索条件は購入店舗、購入日From～To
-- 管理者のみトップ画面からユーザー管理画面へ遷移
-- ユーザー管理画面はユーザーを一覧表示。各項目でフィルタリング可能
-- 一覧のユーザー選択でユーザー編集画面へ遷移
-- ユーザー編集画面では情報の修正、削除が可能
+以下の内容は、現在開発中の「家計簿Webアプリケーション」のシステム構成とこれまでの実装状況のまとめです。この文脈を読み込み、今後の私の質問に対して、この前提条件に基づいた回答を行ってください。
 
-## データ定義
-- T_ACCOUNT:家計簿情報　購入店舗、購入日時、合計金額を管理。
-- T_ACCOUNT_DETAIL:家計簿明細情報　購入品リストを管理。家計簿情報の子テーブル
-- M_USER:ユーザーマスタ　ユーザーを管理
+【プロジェクト概要と技術スタック】
 
-### 開発環境
-Windows11上のWSL2で実行。
-Docker-composeを使用して動作。
-thymeleaf+SpringFramework+Java、FLask+Python、MySQL
+- 用途: 個人利用向けの家計簿アプリケーション
+
+- バックエンド: Java (Spring Boot), Spring Data JPA
+
+- フロントエンド: Thymeleaf, HTML/CSS
+
+- データベース: MySQL (Dockerコンテナ内で稼働、データベース名は `python_schema`)
+
+- OCR API: Python (Flask) + Azure Document Intelligence (SDK v1.0.0以降仕様)
+
+- インフラ/環境: Windows 11 + WSL2 (Ubuntu) + Docker Compose
+
+- マッピングライブラリ: MapStruct
+
+【システム・アーキテクチャの現状】
+
+1. OCR連携:
+
+    - Thymeleafの画面から送信された画像(`MultipartFile`)を、Javaの `OcrService` (RestTemplateを使用) 経由でPythonのOCR APIへ送信。
+
+    - Python側でAzure Document Intelligenceを用いて解析し、結果をJSONで返却。
+
+    - Java側で `OcrResponseDto` として受け取る。
+
+2. データマッピング:
+
+    - `OcrMapper` (MapStruct) を使用し、`OcrResponseDto` から画面用の `AccountForm` および `AccountDetailForm` へ変換。
+
+    - インターフェース内の `default` メソッドを用いて、金額の数値化（カンマ等の除去）や日時の結合(`datetime-local`用)を自動処理している。
+
+3. 画像ファイルの保存と管理 (NAS連携):
+
+    - DBの肥大化を防ぐため、画像はDBのBLOBではなくファイルシステム(NAS)に保存し、DB(`T_ACCOUNT`テーブル)にはパス(例: `/images/temp/...`)のみを保存。
+
+    - 将来のクラウドストレージ(Azure Blob等)拡張を見据え、`FileStorageService` インターフェースを作成し、現在は `LocalFileStorageServiceImpl` を使用。
+
+    - NASの共有フォルダをWindowsのネットワークドライブ経由でWSL2に `drvfs` マウントし、それを `docker-compose.yml` でコンテナの `/app/uploads` にマウントしている。
+
+    - `WebMvcConfig` にて `/images/` を `file:/app/uploads/` にルーティングしている。
+
+4. データベースとエンティティの仕様:
+
+    - WSL2上のMySQLは大文字・小文字を区別するため、`docker-compose.yml` にてSpring Bootの命名戦略を `PhysicalNamingStrategyStandardImpl` に設定し、DDL自動実行は `none` に設定。
+
+    - エンティティ(`TAccount`, `TAccountDetail`)には `@Table(catalog = "python_schema")` を指定し、既存のスキーマを明示的に参照。
+
+    - `TAccountDetail` (明細) の主キーはラッパークラス `Long detailId` を使用し、自動採番(IDENTITY)を利用(Mapperでは `ignore = true` に設定)。
+
+    - 明細の行番号(`detail_number`)は、保存時に `AccountService` 内でループを回して連番を付与している。
+
+【直近の解決済み課題】
+
+    - WSL2環境におけるSMB 2.0プロトコルのマウント制限エラーを、Windowsのネットワークドライブ + `drvfs` マウントで回避する手法を採用したところ。
+
+上記の設定とこれまでの経緯を理解した上で、「準備完了しました。次の要件やエラー内容を教えてください」とだけ返答してください。

@@ -52,7 +52,7 @@
                     <div class="card-body">
                         <form th:action="@{/account/register}" th:object="${accountForm}" method="post">
                             <input type="hidden" th:field="*{accountId}" />
-                            <input type="text" th:field="*{receiptImagePath}" />
+                            <input type="hidden" th:field="*{receiptImagePath}" />
 
                             <div class="form-group mb-3">
                                 <label for="purchaseDatetime">購入日時：</label>
