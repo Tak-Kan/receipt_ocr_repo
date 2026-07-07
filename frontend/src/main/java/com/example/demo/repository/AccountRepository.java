@@ -36,14 +36,14 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
      */
     @Query("SELECT t FROM Account t WHERE " +
            "t.entryUser = :userId AND " +
-           "(:storeName IS NULL OR :storeName = '' OR t.storeName LIKE %:storeName%) AND " +
-           "(:dateFrom IS NULL OR t.purchaseDatetime >= :dateFrom) AND " +
-           "(:dateTo IS NULL OR t.purchaseDatetime <= :dateTo) " +
+           "(:keyword IS NULL OR :keyword = '' OR t.storeName LIKE %:keyword%) AND " +
+           "(:startDate IS NULL OR t.purchaseDatetime >= :startDate) AND " +
+           "(:endDate IS NULL OR t.purchaseDatetime <= :endDate) " +
            "ORDER BY t.purchaseDatetime DESC")
     List<Account> searchAccounts(
             @Param("userId") String userId,
-            @Param("storeName") String storeName,
-            @Param("dateFrom") LocalDateTime dateFrom,
-            @Param("dateTo") LocalDateTime dateTo
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("keyword") String keyword
     );
 }

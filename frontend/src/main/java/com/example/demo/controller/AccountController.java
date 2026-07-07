@@ -2,11 +2,14 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.AccountForm;
 import com.example.demo.dto.AccountDetailForm;
+import com.example.demo.dto.AccountSearchForm;
 import com.example.demo.dto.OcrResponseDto;
+import com.example.demo.entity.Account;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.FileStorageService;
 import com.example.demo.service.OcrService;
 import com.example.demo.mapper.OcrMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -20,9 +23,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.client.RestTemplate;
+import java.util.List;
 
 @Controller
 @RequestMapping("/account")
+@RequiredArgsConstructor
 public class AccountController {
 
     @Autowired
@@ -112,4 +117,20 @@ public class AccountController {
 
         return "redirect:/top";
     }
+
+    // 検索画面の表示と検索実行
+    @GetMapping("/search")
+    public String search(@ModelAttribute("searchForm") AccountSearchForm searchForm, Authentication auth, Model model) {
+        
+        String username = (auth != null) ? auth.getName() : "anonymous";
+
+        // サービスを呼び出して検索を実行（初回アクセス時は全件表示や今月分のみ表示などに調整可能）
+        List<Account> accountList = accountService.search(searchForm, username);
+        
+        // 画面に検索結果を渡す
+        model.addAttribute("accountList", accountList);
+        
+        return "hams_search"; // src/main/resources/templates/hams_search.html
+    }
+
 }
