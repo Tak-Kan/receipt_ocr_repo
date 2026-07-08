@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AccountService {
 
     @Autowired
@@ -75,5 +76,14 @@ public class AccountService {
                 endDateTime,
                 form.getKeyword()
         );
+    }
+
+    /**
+     * IDから家計簿データを取得する
+     */
+    @Transactional(readOnly = true)
+    public Account findById(Long id) {
+        return accountRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("該当のデータが見つかりません。ID: " + id));
     }
 }

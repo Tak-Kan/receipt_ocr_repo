@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 public class AccountDetailForm {
 
+    private Long detailNumber; // 新規追加（新規登録時はnull、編集時は値が入る）
+
     @NotBlank(message = "商品名は必須です")
     private String itemName;
 

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDateTime;
 
 @Data
 public class AccountForm {
@@ -16,7 +18,8 @@ public class AccountForm {
     private String storeName;
 
     @NotBlank(message = "購入日時は必須です")
-    private String purchaseDatetime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime purchaseDatetime;
 
     @NotNull(message = "合計金額は必須です")
     @Min(value = 0, message = "合計金額は0以上の数値を入力してください")

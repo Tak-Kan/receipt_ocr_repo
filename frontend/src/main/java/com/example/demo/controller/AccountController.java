@@ -8,6 +8,7 @@ import com.example.demo.entity.Account;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.FileStorageService;
 import com.example.demo.service.OcrService;
+import com.example.demo.mapper.AccountMapper;
 import com.example.demo.mapper.OcrMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +41,8 @@ public class AccountController {
     private OcrService ocrService;
     @Autowired
     private OcrMapper ocrMapper; // 作成したMapperをDI
+    @Autowired
+    private AccountMapper accountMapper;
 
     public AccountController(OcrService ocrService) {
         this.ocrService = ocrService;
@@ -133,4 +137,21 @@ public class AccountController {
         return "hams_search"; // src/main/resources/templates/hams_search.html
     }
 
+
+    /**
+     * 詳細（編集）画面の表示
+     */
+    @GetMapping("/detail/{id}")
+    public String showEdit(@PathVariable("id") Long id, Model model) {
+        // 1. DBからデータを取得
+        Account account = accountService.findById(id);
+        
+        // 2. Entity を Form に変換
+        AccountForm accountForm = accountMapper.toForm(account);
+        
+        // 3. 画面へ渡す
+        model.addAttribute("accountForm", accountForm);
+        
+        return "edit"; // src/main/resources/templates/account/edit.html
+    }
 }

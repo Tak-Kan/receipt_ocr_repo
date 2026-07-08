@@ -23,4 +23,8 @@ public interface AccountMapper {
     @Mapping(target = "entryUser", ignore = true)    // コントローラー/サービスでセットするため無視
     @Mapping(target = "account", ignore = true)  // 双方向リレーションの親設定はサービス層で行う
     AccountDetail toEntity(AccountDetailForm form);
+
+    // Entity -> Formへの変換ルール（明細リストも自動でマッピングされます）
+    @Mapping(target = "receiptImagePath", source = "imagePath")
+    AccountForm toForm(Account entity);
 }
