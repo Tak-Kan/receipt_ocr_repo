@@ -109,11 +109,16 @@ public class AccountController {
         }
 
         // 本登録のタイミングで、tempから本保存先（NAS or クラウド）へ転送！
-        // 転送先がどこであっても、メソッドを呼ぶだけで適切なURLパスが返ってきます
-        String finalImagePath = fileStorageService.moveToReceipts(accountForm.getReceiptImagePath());
+        // 転送先がどこであっても、メソッドを呼ぶだけで適切なURLパスが返ってきます        
+        String currentImagePath = accountForm.getReceiptImagePath();
+
+        // パスに "temp" が含まれている場合のみ、本番ディレクトリへ移動する
+        if (currentImagePath != null && currentImagePath.contains("/temp/")) {
+            String finalImagePath = fileStorageService.moveToReceipts(currentImagePath);
+            // DBにはこの確定したパスを保存する
+            accountForm.setReceiptImagePath(finalImagePath);
+        }
         
-        // DBにはこの確定したパスを保存する
-        accountForm.setReceiptImagePath(finalImagePath);
         String username = (auth != null) ? auth.getName() : "anonymous";
 
         // サービス処理へ
@@ -152,6 +157,6 @@ public class AccountController {
         // 3. 画面へ渡す
         model.addAttribute("accountForm", accountForm);
         
-        return "edit"; // src/main/resources/templates/account/edit.html
+        return "hams_confirm";
     }
 }

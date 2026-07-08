@@ -17,7 +17,7 @@ public class AccountForm {
     @Size(max = 255, message = "購入店舗は255文字以内で入力してください")
     private String storeName;
 
-    @NotBlank(message = "購入日時は必須です")
+    @NotNull(message = "購入日時は必須です")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime purchaseDatetime;
 
