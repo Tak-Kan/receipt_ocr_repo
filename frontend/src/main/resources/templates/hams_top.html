@@ -29,9 +29,11 @@
 <body class="bg-light">
     <nav class="navbar navbar-dark bg-dark mb-4">
         <div class="container">
-            <a class="navbar-brand" href="#">家計簿管理システム</a>
+            <a class="navbar-brand" th:href="@{/top}">
+                <i class="bi bi-house-door text-primary"></i>家計簿管理システム
+            </a>
             <div class="d-flex align-items-center text-white">
-                <span class="me-3 d-none d-sm-inline" th:text="'ログイン： ' + ${username}">ログイン: 鈴木 一郎 様</span>
+                <span class="me-3 d-none d-sm-inline" th:text="'ログイン中： ' + ${username}">ログイン: 鈴木 一郎 様</span>
                 <a th:href="@{/logout}" class="btn btn-outline-light btn-sm">ログアウト</a>
             </div>
         </div>

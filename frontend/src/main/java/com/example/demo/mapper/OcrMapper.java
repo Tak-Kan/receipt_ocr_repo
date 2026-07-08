@@ -3,6 +3,7 @@ package com.example.demo.mapper;
 import com.example.demo.dto.AccountForm;
 import com.example.demo.dto.AccountDetailForm;
 import com.example.demo.dto.OcrResponseDto;
+import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.mapstruct.Mapper;
@@ -16,7 +17,7 @@ public interface OcrMapper {
     @Mapping(target = "storeName", source = "merchantName")
     @Mapping(target = "details", source = "items")
     // ★ポイント1: 独自メソッド combineDateTime を呼び出して購入日時をセット
-    @Mapping(target = "purchaseDatetime", source = ".", qualifiedByName = "toDateTimeLocalString")
+    @Mapping(target = "purchaseDatetime", source = ".", qualifiedByName = "toLocalDateTime")
     // ★ポイント2: @Named で指定した独自メソッド parseAmount を適用して数値をセット
     @Mapping(target = "totalAmount", source = "totalAmount", qualifiedByName = "parseAmount")
     @Mapping(target = "receiptImagePath", ignore = true) // 画像パスはControllerで後からセットするため無視
@@ -53,6 +54,48 @@ public interface OcrMapper {
                          ? time.substring(0, 5) 
                          : "00:00";
         return date + "T" + timeStr;
+    }
+
+    @Named("toLocalDateTime")
+    default LocalDateTime toLocalDateTime(OcrResponseDto dto) {
+        // 1. 確実なNULLチェック（ここで弾くことで例外を防ぐ）
+        if (dto == null || dto.getDate() == null || dto.getDate().trim().isEmpty()) {
+            return null; // OCRで読み取れなかった場合は素直にnullを返す
+        }
+
+        String dateStr = dto.getDate();
+        String timeStr = dto.getTime();
+
+        // 2. 正規表現で「年」「月」「日」の数字を抽出
+        Pattern pattern = Pattern.compile("(\\d{4})年\\s*(\\d{1,2})月\\s*(\\d{1,2})日");
+        Matcher matcher = pattern.matcher(dateStr);
+        
+        if (!matcher.find()) {
+            return null; // フォーマットが合わず読み取れなかった場合もnullを返す
+        }
+
+        int year = Integer.parseInt(matcher.group(1));
+        int month = Integer.parseInt(matcher.group(2));
+        int day = Integer.parseInt(matcher.group(3));
+
+        // 3. 時刻の抽出（レシートに時刻がない場合は 0時0分 とする）
+        int hour = 0;
+        int minute = 0;
+        if (timeStr != null && !timeStr.trim().isEmpty()) {
+            // "21:30:00" などの文字列をコロンで分割
+            String[] timeParts = timeStr.trim().split(":");
+            if (timeParts.length >= 2) {
+                try {
+                    hour = Integer.parseInt(timeParts[0]);
+                    minute = Integer.parseInt(timeParts[1]);
+                } catch (NumberFormatException e) {
+                    // 時刻のパースに失敗した場合は 00:00 のまま処理を続行
+                }
+            }
+        }
+
+        // 4. LocalDateTime型として直接組み立てて返却
+        return LocalDateTime.of(year, month, day, hour, minute);
     }
 
 

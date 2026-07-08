@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
@@ -33,7 +34,9 @@ public class ReceiptController {
 
     // 画面1: 画像指定画面の表示
     @GetMapping("/upload")
-    public String showUploadScreen() {
+    public String showUploadScreen(Authentication auth, Model model) {
+        String username = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("username", username);
         return "hams_entry";
     }
 

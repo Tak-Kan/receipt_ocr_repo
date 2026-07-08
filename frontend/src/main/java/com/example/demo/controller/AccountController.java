@@ -10,6 +10,7 @@ import com.example.demo.service.FileStorageService;
 import com.example.demo.service.OcrService;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.mapper.OcrMapper;
+import com.example.demo.validation.OnSave;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -52,12 +53,20 @@ public class AccountController {
 
     // 画面1: 画像指定画面の表示
     @GetMapping("/upload")
-    public String showUploadScreen() {
+    public String showUploadScreen(Authentication auth, Model model) {
+        String username = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("username", username);
         return "hams_entry";
     }
 
     @PostMapping("/read")
-    public String readReceipt(@RequestParam("file") MultipartFile file, Model model) {
+    public String readReceipt(@RequestParam("file") MultipartFile file, 
+            Authentication auth, //認証情報
+            Model model) {
+                
+        String username = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("username", username);
+
         try{
             // 2. 【今回のポイント】画像を一時フォルダ（temp）へコピー・保存する
             // 内部で UUID を付与した一意のファイル名（例: 550e8400-e29b..._receipt.jpg）として
@@ -88,7 +97,9 @@ public class AccountController {
 
     // 画面2: 結果表示・編集画面の表示
     @GetMapping("/confirm")
-    public String showConfirmScreen(Model model) {
+    public String showConfirmScreen(Authentication auth, Model model) {
+        String username = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("username", username);
         // FlashAttributeからデータを受け取り、Thymeleafに渡す（空の場合は新規フォーム）
         if (!model.containsAttribute("analyzedData")) {
             return "redirect:/receipt/upload";
@@ -98,14 +109,15 @@ public class AccountController {
 
     @PostMapping("/register")
     public String registerAccount(
-            @Validated @ModelAttribute AccountForm accountForm, // @Validatedでチェック実行
+            // 💡 ここで OnSave グループのバリデーションを実行！
+            @Validated(OnSave.class) @ModelAttribute AccountForm accountForm, // @Validatedでチェック実行
             BindingResult bindingResult, // エラー結果がここに格納される
             Authentication auth, //認証情報
             Model model) {
         
         // バリデーションエラーがある場合は元の確認画面へ戻す
         if (bindingResult.hasErrors()) {
-            return "confirm"; // confirm.htmlへ戻る（エラーメッセージはThymeleaf側で表示可能）
+            return "hams_confirm"; // hams_confirm.htmlへ戻る（エラーメッセージはThymeleaf側で表示可能）
         }
 
         // 本登録のタイミングで、tempから本保存先（NAS or クラウド）へ転送！
@@ -130,8 +142,9 @@ public class AccountController {
     // 検索画面の表示と検索実行
     @GetMapping("/search")
     public String search(@ModelAttribute("searchForm") AccountSearchForm searchForm, Authentication auth, Model model) {
-        
+
         String username = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("username", username);
 
         // サービスを呼び出して検索を実行（初回アクセス時は全件表示や今月分のみ表示などに調整可能）
         List<Account> accountList = accountService.search(searchForm, username);
@@ -147,7 +160,9 @@ public class AccountController {
      * 詳細（編集）画面の表示
      */
     @GetMapping("/detail/{id}")
-    public String showEdit(@PathVariable("id") Long id, Model model) {
+    public String showEdit(@PathVariable("id") Long id, Authentication auth, Model model) {
+        String username = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("username", username);
         // 1. DBからデータを取得
         Account account = accountService.findById(id);
         
