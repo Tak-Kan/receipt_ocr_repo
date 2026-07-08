@@ -13,13 +13,10 @@ public interface AccountMapper {
 
     // Form -> Entityへの変換ルール
     // purchaseDate(String) を LocalDateTime へ指定のフォーマットで自動変換します
-    @Mapping(target = "accountId", ignore = true) // DBで自動生成されるため無視
-    @Mapping(target = "entryUser", ignore = true)    // コントローラー/サービスでセットするため無視
     @Mapping(target = "purchaseDatetime", dateFormat = "yyyy-MM-dd'T'HH:mm")
     @Mapping(target = "imagePath", source = "receiptImagePath")
     Account toEntity(AccountForm form);
 
-    @Mapping(target = "detailNumber", ignore = true)
     @Mapping(target = "entryUser", ignore = true)    // コントローラー/サービスでセットするため無視
     @Mapping(target = "account", ignore = true)  // 双方向リレーションの親設定はサービス層で行う
     AccountDetail toEntity(AccountDetailForm form);

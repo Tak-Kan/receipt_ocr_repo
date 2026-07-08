@@ -27,6 +27,13 @@ public class AccountService {
 
     @Transactional
     public void saveAccount(AccountForm form, String userName) {
+        // 【追加】明細リストから、商品名も金額も空の要素を除外する
+        if (form.getDetails() != null) {
+            form.getDetails().removeIf(detail -> 
+                (detail.getItemName() == null || detail.getItemName().trim().isEmpty()) && 
+                detail.getItemAmount() == null
+            );
+        }
         // 1. MapStructを使用して、Form(DTO)からEntityへ一発で変換
         // （子要素のList<AccountDetailForm>も自動で List<AccountDetail> に変換されます）
         Account account = accountMapper.toEntity(form);

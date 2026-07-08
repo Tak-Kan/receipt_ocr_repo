@@ -58,7 +58,7 @@
                         <h5 class="mb-0">読み取り結果の確認・編集</h5>
                     </div>
                     <div class="card-body">
-                        <form th:action="@{/account/register}" th:object="${accountForm}" method="post">
+                        <form id="mainForm" th:action="@{/account/register}" th:object="${accountForm}" method="post">
                             <input type="hidden" th:field="*{accountId}" />
                             <input type="hidden" th:field="*{receiptImagePath}" />
 
@@ -74,34 +74,46 @@
                                 <div th:if="${#fields.hasErrors('storeName')}" th:errors="*{storeName}" style="color: red;"></div>
                             </div>
                             
-                            <div class="mb-3">
-                                <h6>購入品リスト</h6>
-                                <div th:if="${#fields.hasErrors('details')}" th:errors="*{details}" style="color: red;"></div>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>No.</th>
-                                            <th>商品名</th>
-                                            <th>金額 (円)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="detail, stat : *{details}">
-                                            <td th:text="${stat.count}">1</td>
-                                            <td>
-                                                <input type="text" th:field="*{details[__${stat.index}__].itemName}" style="width: 90%;" />
-                                                <div th:if="${#fields.hasErrors('details[__${stat.index}__].itemName')}" th:errors="*{details[__${stat.index}__].itemName}" style="color: red;"></div>
-                                            </td>
-                                            <td>
-                                                <input type="number" th:field="*{details[__${stat.index}__].itemAmount}" style="width: 90%;" />
-                                                <div th:if="${#fields.hasErrors('details[__${stat.index}__].itemAmount')}" th:errors="*{details[__${stat.index}__].itemAmount}" style="color: red;"></div>
-                                            </td>
-                                        </tr>
-                                        <tr th:if="${#lists.isEmpty(accountForm.details)}">
-                                            <td colspan="3">商品データが読み取れませんでした。</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 py-1">購入明細</h5>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="addRowBtn">
+                                        <i class="bi bi-plus-circle"></i> 行を追加
+                                    </button>
+                                </div>
+                               <div class="card-body p-0">
+                                    <table class="table table-hover align-middle mb-0" id="detailTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col" class="ps-3" style="width: 5%;">#</th>
+                                                <th scope="col" style="width: 45%;">商品名</th>
+                                                <th scope="col" style="width: 25%;">金額</th>
+                                                <th scope="col" style="width: 10%;" class="text-center">削除</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="detailTableBody">
+                                            <tr th:each="detail, stat : *{details}" class="detail-row">
+                                                <input type="hidden" th:field="*{details[__${stat.index}__].detailNumber}">
+                                                
+                                                <td class="ps-3 text-muted row-number" th:text="${stat.count}">1</td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm item-name" th:field="*{details[__${stat.index}__].itemName}">
+                                                </td>
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="number" class="form-control text-end item-amount" th:field="*{details[__${stat.index}__].itemAmount}">
+                                                        <span class="input-group-text">円</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-row-btn">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
 
                             <div class="form-group mb-4">
@@ -121,5 +133,90 @@
             
         </div>
     </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const tableBody = document.getElementById('detailTableBody');
+    const addRowBtn = document.getElementById('addRowBtn');
+    
+    // フォーム全体を囲むformタグのIDを指定してください（例: <form id="accountForm" ...>）
+    const form = document.querySelector('mainForm'); 
+
+    // --- 1. インデックスの振り直し関数 ---
+    // SpringがListとして受け取るために details[0], details[1] と連番にする必要があります
+    function updateRowIndices() {
+        const rows = tableBody.querySelectorAll('tr.detail-row');
+        rows.forEach((row, index) => {
+            // 行番号の見た目を更新
+            row.querySelector('.row-number').textContent = index + 1;
+            
+            // name属性とid属性の details[X] を details[現在のindex] に書き換え
+            row.querySelectorAll('input').forEach(input => {
+                if (input.name) {
+                    input.name = input.name.replace(/details\[\d+\]/, `details[${index}]`);
+                }
+                if (input.id) {
+                    input.id = input.id.replace(/details\d+\./, `details${index}.`);
+                }
+            });
+        });
+    }
+
+    // --- 2. 行追加処理 ---
+    addRowBtn.addEventListener('click', function() {
+        const rows = tableBody.querySelectorAll('tr.detail-row');
+        // 最後の行をクローンする
+        const lastRow = rows[rows.length - 1];
+        const newRow = lastRow.cloneNode(true);
+        
+        // クローンした行の入力値をクリアする
+        newRow.querySelectorAll('input').forEach(input => {
+            input.value = ''; 
+        });
+        
+        // テーブルの最後に追加してインデックスを振り直す
+        tableBody.appendChild(newRow);
+        updateRowIndices();
+    });
+
+    // --- 3. 行削除処理 (イベントデリゲーション) ---
+    tableBody.addEventListener('click', function(e) {
+        // クリックされたのが削除ボタン（またはその中のアイコン）の場合
+        const deleteBtn = e.target.closest('.delete-row-btn');
+        if (deleteBtn) {
+            const rows = tableBody.querySelectorAll('tr.detail-row');
+            if (rows.length > 1) {
+                // 最低1行は残すようにして、対象の行を削除
+                deleteBtn.closest('tr').remove();
+                updateRowIndices();
+            } else {
+                alert('明細は最低1行必要です。');
+            }
+        }
+    });
+
+    // --- 4. 送信時の空行無視（フィルター）処理 ---
+    form.addEventListener('submit', function(e) {
+        const rows = tableBody.querySelectorAll('tr.detail-row');
+        
+        rows.forEach(row => {
+            const itemName = row.querySelector('.item-name').value.trim();
+            const amount = row.querySelector('.item-amount').value;
+            
+            // 商品名と金額が両方とも空欄の場合は、送信前にその行のHTMLを削除する
+            // これによりSpring側のListには空行が渡らず、必須エラーにもなりません
+            if (!itemName && !amount) {
+                // ただし最後の1行だった場合は削除しない（必須エラーとして処理させるため）
+                if (tableBody.querySelectorAll('tr.detail-row').length > 1) {
+                    row.remove();
+                }
+            }
+        });
+        
+        // 削除後にインデックスの歯抜けを防ぐため、最終の振り直しを実行
+        updateRowIndices();
+    });
+});
+</script>
 </body>
 </html>
