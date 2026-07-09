@@ -13,4 +13,9 @@ public interface FileStorageService {
      * 一時フォルダから本保存フォルダへファイルを移動・転送する
      */
     String moveToReceipts(String tempImagePath);
+
+    /**
+     * 本保存フォルダからファイルを削除する
+     */
+    void deleteFile(String imagePath);
 }

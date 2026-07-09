@@ -174,4 +174,17 @@ public class AccountController {
         
         return "hams_confirm";
     }
+
+    /**
+     * データの削除処理
+     */
+    @PostMapping("/delete")
+    public String delete(@RequestParam("accountId") Long accountId) {
+        // フォーム内の隠し項目（<input type="hidden" th:field="*{accountId}">）
+        // の値だけを受け取って削除処理へ渡す
+        accountService.delete(accountId);
+        
+        return "redirect:/account/search";
+    }
+
 }

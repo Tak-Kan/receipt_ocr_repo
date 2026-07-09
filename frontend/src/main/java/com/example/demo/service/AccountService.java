@@ -6,6 +6,7 @@ import com.example.demo.entity.Account;
 import com.example.demo.entity.AccountDetail;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
+import com.example.demo.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class AccountService {
 
     @Autowired
     private AccountMapper accountMapper; // MapStructの自動生成クラスをDI
+
+    @Autowired
+    private FileStorageService fileStorageService; // 設定ファイルに応じて、LocalかAzureが自動で入る
 
     @Transactional
     public void saveAccount(AccountForm form, String userName) {
@@ -93,4 +97,20 @@ public class AccountService {
         return accountRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("該当のデータが見つかりません。ID: " + id));
     }
+
+    /**
+     * IDを指定して家計簿データを削除する
+     */
+    @Transactional
+    public void delete(Long id) {
+        // 💡 補足：DBから削除する前に、NAS上の画像も削除したい場合はここで行います
+        Account account = findById(id);
+        if (account.getImagePath() != null) {
+            fileStorageService.deleteFile(account.getImagePath());
+        }
+        
+        // DBから該当レコード（ヘッダーと、紐づく明細）を削除
+        accountRepository.deleteById(id);
+    }
+
 }

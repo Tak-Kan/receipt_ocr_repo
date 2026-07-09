@@ -123,8 +123,21 @@
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <a th:href="@{/receipt/upload}" class="btn btn-outline-secondary me-md-2">キャンセル</a>
-                                <button type="submit" class="btn btn-success px-5">この内容で登録</button>
+                                <a th:href="${accountForm.accountId == null} ? @{/receipt/upload} : @{/account/search}" class="btn btn-outline-secondary me-md-2">キャンセル</a>
+
+                                <button th:if="${accountForm.accountId != null}" 
+                                        type="submit" 
+                                        class="btn btn-outline-danger btn-lg" 
+                                        th:formaction="@{/account/delete}" 
+                                        formnovalidate
+                                        onclick="return confirm('この家計簿データを完全に削除しますか？');">
+                                    <i class="bi bi-trash"></i> 削除する
+                                </button>
+
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-save"></i> 
+                                    <span th:text="${accountForm.accountId == null} ? 'この内容で登録する' : '変更を保存する'"></span>
+                                </button>
                             </div>
                         </form>
                     </div>
