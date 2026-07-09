@@ -10,6 +10,7 @@ Example SQLAlchemy URL:
 import os
 import time
 import logging
+import re
 from datetime import datetime
 from urllib.parse import quote_plus
 
@@ -210,18 +211,19 @@ def analyze_receipt():
             body=image_bytes,  # analyze_request から body に変更
             content_type="application/octet-stream"
         )
+        # 1件のレシートデータを格納する辞書を作成
+        receipt_data = {
+            "merchant_name": None,
+            "date": None,
+            "time": None,
+            "invoice_number": None,
+            "items": [],
+            "total_amount": None
+        }
 
         # 取得したドキュメント（レシート）ごとに処理
         for receipt in poller.result().documents:
             print("=== レシート解析結果 ===")
-            # 1件のレシートデータを格納する辞書を作成
-            receipt_data = {
-                "merchant_name": None,
-                "date": None,
-                "time": None,
-                "items": [],
-                "total_amount": None
-            }
             
             # 1. 購入店舗 (MerchantName)
             merchant_name = receipt.fields.get("MerchantName")
@@ -273,8 +275,24 @@ def analyze_receipt():
                 # print(f"合計金額: {total.content}")
                 receipt_data["total_amount"] = total.content
             
-            all_receipts_data.append(receipt_data)
-            print(receipt_data)
+        # レシート全体から読み取られた生のテキストデータを取得
+        full_text = poller.result().content
+
+        # 正規表現で「T」または「t」から始まり、13桁の数字が続くパターンを検索
+        # （OCRの特性上、Tの後に意図せず半角スペースが入るケースも考慮しています）
+        match = re.search(r'[Tt]\s*\d{13}', full_text)
+
+        if match:
+            # スペースなどの不要な文字を除去して整形
+            receipt_data["invoice_number"] = match.group(0).replace(" ", "").upper()
+        else:
+            print("全文の中にも T+13桁 の番号は見つかりませんでした。")
+            
+            # 原因調査のため、読み取られた全文を出力して目視確認します
+            # print("\n--- 読み取られた全文 ---")
+            # print(full_text)
+
+        print(receipt_data)
             
     except Exception as e:
         return jsonify({'error': '読み取り処理でエラーが発生しました'}), 400

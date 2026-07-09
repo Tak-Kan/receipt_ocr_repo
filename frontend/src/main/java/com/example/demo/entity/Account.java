@@ -23,6 +23,12 @@ public class Account {
     @Column(name = "purchase_datetime")
     private LocalDateTime purchaseDatetime;
 
+    @Column(name = "invoice_number")
+    private String invoiceNumber;
+
+    @Column(name = "memo")
+    private String memo;
+
     @Column(name = "total_amount")
     private Integer totalAmount;
 

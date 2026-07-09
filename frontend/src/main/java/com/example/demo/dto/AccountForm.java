@@ -22,6 +22,12 @@ public class AccountForm {
     @NotNull(groups = OnSave.class, message = "購入日時は必須です")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime purchaseDatetime;
+    
+    @Size(max = 15, message = "事業者登録番号は15文字以内で入力してください")
+    private String invoiceNumber;
+    
+    @Size(max = 200, message = "備考は200文字以内で入力してください")
+    private String memo;
 
     @NotNull(groups = OnSave.class, message = "合計金額は必須です")
     @Min(value = 0, message = "合計金額は0以上の数値を入力してください")

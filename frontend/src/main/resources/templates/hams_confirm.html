@@ -73,6 +73,12 @@
                                 <input type="text" id="storeName" th:field="*{storeName}" style="width: 300px;" />
                                 <div th:if="${#fields.hasErrors('storeName')}" th:errors="*{storeName}" style="color: red;"></div>
                             </div>
+
+                            <div class="form-group mb-3">
+                                <label for="invoiceNumber">事業者登録番号：</label>
+                                <input type="text" id="invoiceNumber" th:field="*{invoiceNumber}" style="width: 300px;" />
+                                <div th:if="${#fields.hasErrors('invoiceNumber')}" th:errors="*{invoiceNumber}" style="color: red;"></div>
+                            </div>
                             
                             <div class="card shadow-sm">
                                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -120,6 +126,12 @@
                                 <label for="totalAmount">合計金額 (円)：</label>
                                 <input type="number" id="totalAmount" th:field="*{totalAmount}" />
                                 <div th:if="${#fields.hasErrors('totalAmount')}" th:errors="*{totalAmount}" style="color: red;"></div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="memo">備考：</label>
+                                <input type="text" id="memo" th:field="*{memo}" style="width: 300px;" />
+                                <div th:if="${#fields.hasErrors('memo')}" th:errors="*{memo}" style="color: red;"></div>
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">

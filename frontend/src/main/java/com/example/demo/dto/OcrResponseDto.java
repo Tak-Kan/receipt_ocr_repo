@@ -12,6 +12,9 @@ public class OcrResponseDto {
     private String date;
     private String time;
     
+    @JsonProperty("invoice_number")
+    private String invoiceNumber;
+    
     @JsonProperty("total_amount")
     private String totalAmount; // Python側で .content (文字列) を取得しているためStringで受ける
     
