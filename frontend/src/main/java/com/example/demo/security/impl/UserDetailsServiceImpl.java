@@ -2,7 +2,7 @@
 package com.example.demo.security;
 
 import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository2;
+import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepository2 userRepository;
+    private final UserRepository userRepository;
 
     /**
      * Spring Securityがログイン処理を行う際に自動的に呼び出されるメソッド

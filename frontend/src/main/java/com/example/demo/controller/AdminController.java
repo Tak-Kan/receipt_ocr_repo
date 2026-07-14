@@ -1,11 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.AppUser;
-import com.example.demo.model.UserRole;
-import com.example.demo.model.RoleName;
 import com.example.demo.service.UserService;
-import com.example.demo.service.UserService2;
-import com.example.demo.repository.RoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,24 +19,12 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserService2 userService2;
-
-    @Autowired
-    private RoleRepository roleRepo;
-
     @GetMapping("/users")
     public String listUsers(Model model) {
-        model.addAttribute("users", userService.findAll());
-        return "admin/list";
-    }
-
-    @GetMapping("/users2")
-    public String listUsers2(Model model) {
-        model.addAttribute("users", userService2.findAllUsers());
+        model.addAttribute("users", userService.findAllUsers());
         return "admin/user_list";
     }
-
+/* 
     @GetMapping("/users/{id}/edit")
     public String editUserForm(@PathVariable Long id, Model model) {
         var u = userService.findById(id);
@@ -84,5 +67,5 @@ public class AdminController {
     public String deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
         return "redirect:/admin/users";
-    }
+    } */
 }

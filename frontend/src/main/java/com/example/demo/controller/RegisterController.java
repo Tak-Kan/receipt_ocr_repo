@@ -1,7 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.AppUser;
-import com.example.demo.model.RoleName;
 import com.example.demo.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,7 @@ public class RegisterController {
 
     @PostMapping("/register")
     public String doRegister(HttpServletRequest req, Model model) {
-        String username = req.getParameter("username");
+/*         String username = req.getParameter("username");
         String password = req.getParameter("password");
         String password2 = req.getParameter("password2");
 
@@ -44,6 +42,7 @@ public class RegisterController {
         // default role: ROLE_USER
         // userService.createUser(username, password, "ROLE_USER");
         userService.createUser(username, password, Set.of(RoleName.USER));
-        return "redirect:/login?registered";
+        */
+        return "redirect:/login?registered"; 
     }
 }

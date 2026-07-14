@@ -2,8 +2,8 @@ package com.example.demo.config;
 
 import com.example.demo.entity.User;
 import com.example.demo.entity.Role;
-import com.example.demo.repository.UserRepository2;
-import com.example.demo.repository.RoleRepository2;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class DataSeedConfig {
 
-    private final UserRepository2 userRepository;
-    private final RoleRepository2 roleRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
 
     @Bean
