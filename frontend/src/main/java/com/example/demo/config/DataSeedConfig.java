@@ -64,7 +64,6 @@ public class DataSeedConfig {
                 admin.setUserName("テスト管理者");
                 // "password" という文字列を暗号化してセット
                 admin.setPassword(passwordEncoder.encode("adminpassword")); 
-                //admin.setEmail("admin@example.com");
                 admin.setRole(adminRole);
                 admin.setEntryUser("SYSTEM");
                 admin.setEntryDatetime(LocalDateTime.now());

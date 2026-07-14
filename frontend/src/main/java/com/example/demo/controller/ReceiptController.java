@@ -35,8 +35,8 @@ public class ReceiptController {
     // 画面1: 画像指定画面の表示
     @GetMapping("/upload")
     public String showUploadScreen(Authentication auth, Model model) {
-        String username = (auth != null) ? auth.getName() : "anonymous";
-        model.addAttribute("username", username);
+        String userName = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("userName", userName);
         return "hams_entry";
     }
 

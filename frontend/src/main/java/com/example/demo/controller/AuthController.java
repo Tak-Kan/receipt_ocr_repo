@@ -18,8 +18,8 @@ public class AuthController {
         if (session == null || session.getAttribute(SESSION_USER_KEY) == null) {
             return "redirect:/login";
         }
-        String username = (String) session.getAttribute(SESSION_USER_KEY);
-        model.addAttribute("username", username);
+        String userName = (String) session.getAttribute(SESSION_USER_KEY);
+        model.addAttribute("userName", userName);
         return "hams_top";
     }
 

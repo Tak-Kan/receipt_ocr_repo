@@ -18,8 +18,8 @@ public class HomeController {
 
     @GetMapping("/top")
     public String topPage(Authentication auth, Model model) {
-        String username = (auth != null) ? auth.getName() : "anonymous";
-        model.addAttribute("username", username);
+        String userName = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("userName", userName);
         return "hams_top";
     }
 }

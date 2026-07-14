@@ -55,8 +55,8 @@ public class AccountController {
     // 画面1: 画像指定画面の表示
     @GetMapping("/upload")
     public String showUploadScreen(Authentication auth, Model model) {
-        String username = (auth != null) ? auth.getName() : "anonymous";
-        model.addAttribute("username", username);
+        String userName = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("userName", userName);
         return "hams_entry";
     }
 
@@ -65,8 +65,8 @@ public class AccountController {
             Authentication auth, //認証情報
             Model model) {
                 
-        String username = (auth != null) ? auth.getName() : "anonymous";
-        model.addAttribute("username", username);
+        String userName = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("userName", userName);
 
         try{
             // 2. 【今回のポイント】画像を一時フォルダ（temp）へコピー・保存する
@@ -99,8 +99,8 @@ public class AccountController {
     // 画面2: 結果表示・編集画面の表示
     @GetMapping("/confirm")
     public String showConfirmScreen(Authentication auth, Model model) {
-        String username = (auth != null) ? auth.getName() : "anonymous";
-        model.addAttribute("username", username);
+        String userName = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("userName", userName);
         // FlashAttributeからデータを受け取り、Thymeleafに渡す（空の場合は新規フォーム）
         if (!model.containsAttribute("analyzedData")) {
             return "redirect:/receipt/upload";
@@ -132,10 +132,10 @@ public class AccountController {
             accountForm.setReceiptImagePath(finalImagePath);
         }
         
-        String username = (auth != null) ? auth.getName() : "anonymous";
+        String userName = (auth != null) ? auth.getName() : "anonymous";
 
         // サービス処理へ
-        accountService.saveAccount(accountForm, username);
+        accountService.saveAccount(accountForm, userName);
 
         return "redirect:/top";
     }
@@ -144,11 +144,11 @@ public class AccountController {
     @GetMapping("/search")
     public String search(@ModelAttribute("searchForm") AccountSearchForm searchForm, Authentication auth, Model model) {
 
-        String username = (auth != null) ? auth.getName() : "anonymous";
-        model.addAttribute("username", username);
+        String userName = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("userName", userName);
 
         // サービスを呼び出して検索を実行（初回アクセス時は全件表示や今月分のみ表示などに調整可能）
-        List<Account> accountList = accountService.search(searchForm, username);
+        List<Account> accountList = accountService.search(searchForm, userName);
         
         // 画面に検索結果を渡す
         model.addAttribute("accountList", accountList);
@@ -162,8 +162,8 @@ public class AccountController {
      */
     @GetMapping("/detail/{id}")
     public String showEdit(@PathVariable("id") Long id, Authentication auth, Model model) {
-        String username = (auth != null) ? auth.getName() : "anonymous";
-        model.addAttribute("username", username);
+        String userName = (auth != null) ? auth.getName() : "anonymous";
+        model.addAttribute("userName", userName);
         // 1. DBからデータを取得
         Account account = accountService.findById(id);
         
