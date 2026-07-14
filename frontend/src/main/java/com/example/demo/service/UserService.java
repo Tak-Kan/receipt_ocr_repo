@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.AppUser;
-import com.example.demo.model.Role;
+import com.example.demo.model.UserRole;
 import com.example.demo.model.RoleName;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
@@ -33,14 +33,14 @@ public class UserService {
         return repo.save(u);
     }
 
-    public Set<Role> resolveRoles(Set<RoleName> roleNames) {
+    public Set<UserRole> resolveRoles(Set<RoleName> roleNames) {
         if (roleNames == null || roleNames.isEmpty()) {
             roleNames = Set.of(RoleName.USER);
         }
         return roleNames.stream()
                 .map(rn -> roleRepo.findByName(rn)
                         .orElseGet(() -> {
-                            Role r = new Role();
+                            UserRole r = new UserRole();
                             r.setName(rn);
                             return roleRepo.save(r);
                         }))

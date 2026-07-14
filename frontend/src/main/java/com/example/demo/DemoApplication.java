@@ -1,7 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.model.AppUser;
-import com.example.demo.model.Role;
+import com.example.demo.model.UserRole;
 import com.example.demo.model.RoleName;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
@@ -24,13 +24,13 @@ public class DemoApplication {
   CommandLineRunner initUsers(UserRepository userRepo, RoleRepository roleRepo, BCryptPasswordEncoder passwordEncoder) {
     return args -> {
       // ensure roles exist
-      Role userRole = roleRepo.findByName(RoleName.USER).orElseGet(() -> {
-        Role r = new Role();
+      UserRole userRole = roleRepo.findByName(RoleName.USER).orElseGet(() -> {
+        UserRole r = new UserRole();
         r.setName(RoleName.USER);
         return roleRepo.save(r);
       });
-      Role adminRole = roleRepo.findByName(RoleName.ADMIN).orElseGet(() -> {
-        Role r = new Role();
+      UserRole adminRole = roleRepo.findByName(RoleName.ADMIN).orElseGet(() -> {
+        UserRole r = new UserRole();
         r.setName(RoleName.ADMIN);
         return roleRepo.save(r);
       });

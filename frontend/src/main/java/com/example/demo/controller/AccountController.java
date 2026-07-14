@@ -13,6 +13,7 @@ import com.example.demo.mapper.OcrMapper;
 import com.example.demo.validation.OnSave;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -179,6 +180,7 @@ public class AccountController {
      * データの削除処理
      */
     @PostMapping("/delete")
+    @PreAuthorize("hasAuthority('AUTH_DELETE')") // 💡 URLを直接叩かれても、権限がなければ弾く（403エラーにする）
     public String delete(@RequestParam("accountId") Long accountId) {
         // フォーム内の隠し項目（<input type="hidden" th:field="*{accountId}">）
         // の値だけを受け取って削除処理へ渡す

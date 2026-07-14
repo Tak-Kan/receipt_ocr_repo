@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.AppUser;
-import com.example.demo.model.Role;
+import com.example.demo.model.UserRole;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         Set<SimpleGrantedAuthority> authorities = u.getRoles().stream()
-                .map(Role::getName)               // RoleName enum
+                .map(UserRole::getName)               // RoleName enum
                 .map(rn -> "ROLE_" + rn.name())  // Spring の ROLE_ プレフィックスに合わせる
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());

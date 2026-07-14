@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Role;
+import com.example.demo.model.UserRole;
 import com.example.demo.model.RoleName;
 import com.example.demo.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,21 +17,21 @@ public class RoleService {
     @Autowired
     private RoleRepository roleRepo;
 
-    public List<Role> findAll() {
+    public List<UserRole> findAll() {
         return roleRepo.findAll();
     }
 
-    public Optional<Role> findById(Long id) {
+    public Optional<UserRole> findById(Long id) {
         return roleRepo.findById(id);
     }
 
-    public Optional<Role> findByName(RoleName name) {
+    public Optional<UserRole> findByName(RoleName name) {
         return roleRepo.findByName(name);
     }
 
-    public Role create(RoleName name) {
+    public UserRole create(RoleName name) {
         return roleRepo.findByName(name).orElseGet(() -> {
-            Role r = new Role();
+            UserRole r = new UserRole();
             r.setName(name);
             return roleRepo.save(r);
         });
@@ -46,7 +46,7 @@ public class RoleService {
      */
     public List<RoleName> availableRoleNames() {
         List<RoleName> existing = roleRepo.findAll().stream()
-                .map(Role::getName)
+                .map(UserRole::getName)
                 .collect(Collectors.toList());
         return Arrays.stream(RoleName.values())
                 .filter(rn -> !existing.contains(rn))

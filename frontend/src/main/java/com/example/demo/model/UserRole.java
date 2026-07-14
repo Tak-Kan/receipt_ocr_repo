@@ -5,7 +5,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "role", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
-public class Role {
+public class UserRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
