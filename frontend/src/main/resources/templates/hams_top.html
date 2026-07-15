@@ -84,13 +84,15 @@
 
             <!-- テストページボタン（クリックで /testPage へ） -->
             <div class="col-12 col-md-6 col-lg-5">
-                <a th:href="@{/testPage}" class="card h-100 shadow-sm menu-card text-center p-4 border-0 rounded-3">
-                    <div class="card-body">
-                        <div class="card-icon">🐞</div>
-                        <h4 class="card-title fw-bold text-dark">テストページ</h4>
-                        <p class="card-text text-muted mt-2">開発用テストページ</p>
-                    </div>
-                </a>
+                <div class="card h-100 shadow-none text-center p-4 border-0 rounded-3 bg-secondary bg-opacity-10 opacity-50 pe-none" style="cursor: not-allowed;">
+                    <a th:href="@{/testPage}" class="card h-100 shadow-sm menu-card text-center p-4 border-0 rounded-3">
+                        <div class="card-body">
+                            <div class="card-icon">🐞</div>
+                            <h4 class="card-title fw-bold text-dark">テストページ</h4>
+                            <p class="card-text text-muted mt-2">開発用テストページ</p>
+                        </div>
+                    </a>
+                </div>
             </div>
             <p>Welcome to the top page. This page is protected by Spring Security (DB authentication).</p>
 
