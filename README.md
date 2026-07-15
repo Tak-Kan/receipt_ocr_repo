@@ -130,7 +130,7 @@ services:
 
 ```Bash
 docker compose down
-docker compose up -d
+docker compose up --build frontend
 ```
 
 起動後、アプリの編集画面を開いて画像がリンク切れ（表示されない）になれば、画像は「コンテナ内部」にしか存在していなかったことが確定します（コンテナ破棄と共に画像も消滅した状態です）。<br>

@@ -145,7 +145,7 @@ public class AccountController {
     public String search(@ModelAttribute("searchForm") AccountSearchForm searchForm, Authentication auth, Model model) {
 
         String userName = (auth != null) ? auth.getName() : "anonymous";
-        model.addAttribute("userName", userName);
+        //model.addAttribute("userName", userName);
 
         // サービスを呼び出して検索を実行（初回アクセス時は全件表示や今月分のみ表示などに調整可能）
         List<Account> accountList = accountService.search(searchForm, userName);
