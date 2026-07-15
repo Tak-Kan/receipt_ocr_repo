@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ロール管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-shield-lock"></i> ロール管理</h2>
+        <div>
+            <a th:href="@{/admin/roles/new}" class="btn btn-primary me-2"><i class="bi bi-plus-circle"></i> 新規追加</a>
+            <a th:href="@{/admin/users}" class="btn btn-outline-secondary">ユーザー管理へ</a>
+        </div>
+    </div>
+
+    <!-- 削除エラー時のメッセージ表示 -->
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-3">ID</th>
+                        <th>ロール名</th>
+                        <th class="text-center">登録権限</th>
+                        <th class="text-center">削除権限</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="role : ${roles}">
+                        <td class="ps-3 text-muted" th:text="${role.roleId}">1</td>
+                        <td class="fw-bold" th:text="${role.roleName}">管理者</td>
+                        <td class="text-center">
+                            <i th:if="${role.authEntryFlag}" class="bi bi-check-circle-fill text-success"></i>
+                            <i th:unless="${role.authEntryFlag}" class="bi bi-dash-circle text-muted"></i>
+                        </td>
+                        <td class="text-center">
+                            <i th:if="${role.authDeleteFlag}" class="bi bi-check-circle-fill text-success"></i>
+                            <i th:unless="${role.authDeleteFlag}" class="bi bi-dash-circle text-muted"></i>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a th:href="@{/admin/roles/{id}/edit(id=${role.roleId})}" class="btn btn-sm btn-outline-primary">編集</a>
+                                <!-- IDが1(管理者)の場合は削除ボタンを非表示にする制御 -->
+                                <form th:if="${role.roleId != 1}" th:action="@{/admin/roles/{id}/delete(id=${role.roleId})}" method="post" onsubmit="return confirm('本当に削除しますか？');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">削除</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

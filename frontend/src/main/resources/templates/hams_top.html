@@ -71,7 +71,7 @@
 
             <!-- 管理者は有効なボタン（クリックで /admin/users へ） -->
             <div class="col-12 col-md-6 col-lg-5" sec:authorize="hasRole('ADMIN')">
-                <a th:href="@{/admin/users}" class="card h-100 shadow-sm menu-card text-center p-4 border-0 rounded-3">
+                <a th:href="@{/admin/roles}" class="card h-100 shadow-sm menu-card text-center p-4 border-0 rounded-3">
                     <div class="card-body">
                         <div class="card-icon">⚙️</div>
                         <h4 class="card-title fw-bold text-dark">ユーザー情報管理</h4>
