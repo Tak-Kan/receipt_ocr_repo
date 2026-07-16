@@ -60,6 +60,17 @@
                 </a>
             </div>
 
+            <!-- 画像取込ボタン（クリックで /image/entry へ） -->
+            <div class="col-12 col-md-6 col-lg-5">
+                <a th:href="@{/dashboard}" class="card h-100 shadow-sm menu-card text-center p-4 border-0 rounded-3" disabled>
+                    <div class="card-body">
+                        <div class="card-icon"><i class="bi bi-pie-chart"></i></div>
+                        <h4 class="card-title fw-bold text-dark">ダッシュボード</h4>
+                        <p class="card-text text-muted mt-2">月別集計結果を検索・表示します。</p>
+                    </div>
+                </a>
+            </div>
+
             <!-- 管理者は有効なボタン（クリックで /admin/users へ） -->
             <div class="col-12 col-md-6 col-lg-5" sec:authorize="hasRole('ADMIN')">
                 <a th:href="@{/admin/roles}" class="card h-100 shadow-sm menu-card text-center p-4 border-0 rounded-3">
@@ -79,19 +90,6 @@
                         <h4 class="card-title fw-bold text-secondary">ユーザー情報管理</h4>
                         <p class="card-text text-muted mt-2">ユーザー管理を行います。<br><strong class="text-danger small">※管理者権限が必要です</strong></p>
                     </div>
-                </div>
-            </div>
-
-            <!-- テストページボタン（クリックで /testPage へ） -->
-            <div class="col-12 col-md-6 col-lg-5">
-                <div class="card h-100 shadow-none text-center p-4 border-0 rounded-3 bg-secondary bg-opacity-10 opacity-50 pe-none" style="cursor: not-allowed;">
-                    <a th:href="@{/testPage}" class="card h-100 shadow-sm menu-card text-center p-4 border-0 rounded-3">
-                        <div class="card-body">
-                            <div class="card-icon">🐞</div>
-                            <h4 class="card-title fw-bold text-dark">テストページ</h4>
-                            <p class="card-text text-muted mt-2">開発用テストページ</p>
-                        </div>
-                    </a>
                 </div>
             </div>
             <p>Welcome to the top page. This page is protected by Spring Security (DB authentication).</p>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ダッシュボード</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav th:replace="~{layout/header :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>ダッシュボード</h2>
+            
+            <!-- 対象月の切り替えフォーム -->
+            <form th:action="@{/dashboard}" method="get" class="d-flex">
+                <input type="month" name="month" class="form-control me-2" 
+                    th:value="${targetMonth}" onchange="this.form.submit()">
+            </form>
+        </div>
+
+        <!-- 合計金額のカード表示 -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">月間合計支出</h5>
+                        <h2 class="card-text" th:text="${'¥ ' + #numbers.formatInteger(totalExpense, 3, 'COMMA')}">¥ 0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- グラフ表示エリア -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">カテゴリ別支出割合</div>
+                    <div class="card-body">
+                        <!-- データがない場合の表示 -->
+                        <div th:if="${summaryList.isEmpty()}" class="alert alert-info">
+                            データがありません。
+                        </div>
+                        <!-- Chart.js描画用Canvas -->
+                        <canvas th:unless="${summaryList.isEmpty()}" id="expenseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 集計テーブル表示エリア -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">カテゴリ別詳細</div>
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>カテゴリ</th>
+                                    <th class="text-end">金額</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="summary : ${summaryList}">
+                                    <td th:text="${summary.categoryName}">食費</td>
+                                    <td class="text-end" th:text="${'¥ ' + #numbers.formatInteger(summary.totalAmount, 3, 'COMMA')}">¥ 10,000</td>
+                                </tr>
+                                <tr th:if="${summaryList.isEmpty()}">
+                                    <td colspan="2" class="text-center text-muted">データがありません。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js の CDN 読み込み -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Thymeleafの変数をJavaScriptに展開してChart.jsを描画 -->
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*<![CDATA[*/
+            // Thymeleafから渡されたデータをJS変数に格納
+            const labels = /*[[${chartLabels}]]*/ [];
+            const data = /*[[${chartData}]]*/ [];
+            /*]]>*/
+
+            if (data.length > 0) {
+                const ctx = document.getElementById('expenseChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut', // 'pie' や 'bar' に変更可能
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '支出金額 (円)',
+                            data: data,
+                            // カテゴリ数に合わせてよしなに色を設定するパレット
+                            backgroundColor: [
+                                '#0d6efd', '#6610f2', '#6f42c1', '#d63384', 
+                                '#dc3545', '#fd7e14', '#ffc107', '#198754', 
+                                '#20c997', '#0dcaf0', '#adb5bd'
+                            ],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

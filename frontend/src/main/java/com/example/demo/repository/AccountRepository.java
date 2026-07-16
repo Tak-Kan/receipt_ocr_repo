@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import com.example.demo.dto.CategorySummaryDto;
 import com.example.demo.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -54,4 +55,14 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             @Param("endDate") LocalDateTime endDate,
             @Param("keyword") String keyword
     );
+
+    // 指定した年・月のカテゴリ別合計金額を取得
+    // ※ a.accountDate や a.totalAmount は実際のEntityのフィールド名に合わせてください
+    @Query("SELECT new com.example.demo.dto.CategorySummaryDto(" +
+           "COALESCE(c.categoryName, '未分類'), SUM(a.totalAmount)) " +
+           "FROM Account a LEFT JOIN a.accountCategory c " +
+           "WHERE a.entryUser = :userId AND YEAR(a.purchaseDatetime) = :year AND MONTH(a.purchaseDatetime) = :month " +
+           "GROUP BY c.categoryName " +
+           "ORDER BY SUM(a.totalAmount) DESC")
+    List<CategorySummaryDto> findMonthlySummaryByCategory(@Param("userId") String userId, @Param("year") int year, @Param("month") int month);
 }
