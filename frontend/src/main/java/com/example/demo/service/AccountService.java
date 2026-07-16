@@ -4,8 +4,10 @@ import com.example.demo.dto.AccountForm;
 import com.example.demo.dto.AccountSearchForm;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.AccountDetail;
+import com.example.demo.entity.AccountCategory;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
+import com.example.demo.repository.AcCategoryRepository;
 import com.example.demo.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ public class AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private AcCategoryRepository categoryRepository;
 
     @Autowired
     private AccountMapper accountMapper; // MapStructの自動生成クラスをDI
@@ -43,6 +47,14 @@ public class AccountService {
         Account account = accountMapper.toEntity(form);
 
         LocalDateTime now = LocalDateTime.now();
+
+        // save メソッド内で、Accountエンティティに値を詰める際に以下を追加します
+        if (form.getCategoryId() != null) {
+            AccountCategory category = categoryRepository.findById(form.getCategoryId()).orElse(null);
+            account.setAccountCategory(category);
+        } else {
+            account.setAccountCategory(null);
+        }
         
         // 2. Formには持たせていない、システム側の必須情報をセット
         account.setEntryUser(userName);

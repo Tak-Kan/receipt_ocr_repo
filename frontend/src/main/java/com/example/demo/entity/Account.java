@@ -47,6 +47,11 @@ public class Account {
     @Column(name = "update_user")
     private String updateUser;
 
+    // 💡 AccounteCategoryエンティティと category_id で結合します（多対1の関係）
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private AccountCategory accountCategory;
+
     // mappedByは子エンティティ側でヘッダーを保持しているフィールド名
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AccountDetail> details = new ArrayList<>();

@@ -35,6 +35,8 @@ public class AccountForm {
 
     private String receiptImagePath; // 任意項目のためアノテーションなし
 
+    private Integer categoryId; // 任意項目のためアノテーションなし
+
     @Valid // ネストされた子要素（リスト）のバリデーションを有効にする魔法のアノテーション
     @NotEmpty(message = "購入品は最低1件以上必要です")
     private List<AccountDetailForm> details = new ArrayList<>();

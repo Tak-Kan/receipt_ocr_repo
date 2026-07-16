@@ -61,6 +61,7 @@
                                 <th scope="col" class="ps-4">ID</th>
                                 <th scope="col">購入日時</th>
                                 <th scope="col">店舗名</th>
+                                <th scope="col" class="text-end">費目</th>
                                 <th scope="col" class="text-end">合計金額</th>
                                 <th scope="col" class="text-center pe-4">アクション</th>
                             </tr>
@@ -76,6 +77,7 @@
                                 <td class="ps-4 text-muted" th:text="${account.accountId}">1</td>
                                 <td th:text="${#temporals.format(account.purchaseDatetime, 'yyyy/MM/dd HH:mm')}">2026/07/06 21:30</td>
                                 <td th:text="${account.storeName}">スーパー〇〇</td>
+                                <td th:text="${account.accountCategory != null ? account.accountCategory.categoryName : '未分類'}"></td>
                                 <td class="text-end fw-bold" th:text="${#numbers.formatInteger(account.totalAmount, 1, 'COMMA')} + ' 円'">1,000 円</td>
                                 <td class="text-center pe-4">
                                     <a th:href="@{/account/detail/{id}(id=${account.accountId})}" class="btn btn-sm btn-outline-info">

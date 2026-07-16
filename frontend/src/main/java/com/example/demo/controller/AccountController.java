@@ -8,6 +8,7 @@ import com.example.demo.entity.Account;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.FileStorageService;
 import com.example.demo.service.OcrService;
+import com.example.demo.repository.AcCategoryRepository;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.mapper.OcrMapper;
 import com.example.demo.validation.OnSave;
@@ -36,6 +37,8 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private AcCategoryRepository categoryRepository;
     @Autowired
     private FileStorageService fileStorageService; // 設定ファイルに応じて、LocalかAzureが自動で入る
     // 作成したOcrServiceを注入
@@ -86,6 +89,8 @@ public class AccountController {
 
             model.addAttribute("accountForm", form);
 
+            model.addAttribute("categories", categoryRepository.findAll()); // 💡 追加
+
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("errorMessage", "読み取り処理に失敗しました: " + e.getMessage());
@@ -101,6 +106,7 @@ public class AccountController {
     public String showConfirmScreen(Authentication auth, Model model) {
         String userName = (auth != null) ? auth.getName() : "anonymous";
         model.addAttribute("userName", userName);
+        model.addAttribute("categories", categoryRepository.findAll()); // 💡 追加
         // FlashAttributeからデータを受け取り、Thymeleafに渡す（空の場合は新規フォーム）
         if (!model.containsAttribute("analyzedData")) {
             return "redirect:/receipt/upload";
@@ -172,6 +178,8 @@ public class AccountController {
         
         // 3. 画面へ渡す
         model.addAttribute("accountForm", accountForm);
+
+        model.addAttribute("categories", categoryRepository.findAll()); // 💡 追加
         
         return "hams_confirm";
     }

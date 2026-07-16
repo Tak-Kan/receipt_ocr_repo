@@ -13,6 +13,14 @@ import java.util.List;
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
     /**
+     * カテゴリマスタの削除時、道連れ削除を防ぐためのメソッド
+     *
+     * @param categoryId 費目マスタID
+     * @return 家計簿情報のリスト
+     */
+    boolean existsByAccountCategory_CategoryId(Integer categoryId);
+
+    /**
      * ログイン中ユーザーの家計簿情報をすべて取得します（購入日時の新しい順）
      * ※Spring Data JPAの命名規則により、メソッド名だけでクエリが自動生成されます。
      *

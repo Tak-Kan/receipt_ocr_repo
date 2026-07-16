@@ -23,5 +23,6 @@ public interface AccountMapper {
 
     // Entity -> Formへの変換ルール（明細リストも自動でマッピングされます）
     @Mapping(target = "receiptImagePath", source = "imagePath")
+    @Mapping(target = "categoryId", source = "accountCategory.categoryId")
     AccountForm toForm(Account entity);
 }
