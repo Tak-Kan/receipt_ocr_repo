@@ -32,6 +32,11 @@
    - Backend:  http://localhost:5000/api/users
    - MySQL: (ホスト) localhost:3306（必要であれば MySQL クライアントで接続）
 
+5. 環境変数の設定
+   5.1. `cp .env.template .env` コマンドを実行し、設定ファイルをコピー。
+   5.2. `.env` ファイルを開き、各自の環境に合わせてパスワード等を書き換える。
+   5.3. `docker compose up -d` を実行。
+
 ## ログイン実行手順
 1. ローカル実行:
    - cd frontend
