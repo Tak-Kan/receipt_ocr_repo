@@ -2,10 +2,12 @@
 # Docker Compose サンプル: Flask (Python) + Spring Boot (Java) + MariaDB
 
 ## 概要
-- Backend: Python 3 + Flask (REST API)
-- Frontend: Java 17 + Spring Boot (シンプルなコントローラ)
+- Backend1: Java 17, Spring Boot, Spring Security, Spring Data JPA
+- Backend2: Python 3 + Flask (REST API)
+- Frontend: Thymeleaf (Spring Security拡張タグ利用), Bootstrap 5
 - DB: MariaDB 10
 - Orchestration: docker compose
+- OCR連携: Azure Document Intelligence
 - 実行環境: Windows 11 の WSL2（Docker Desktop with WSL2 backend 推奨）
 
 ## 前提条件
@@ -25,7 +27,7 @@
    ```bash
    docker compose build --no-cache frontend
    ```
-4. ブラウザまたは curl で確認:
+4. ブラウザまたは curl で動作確認:
    - Frontend: http://localhost:8080/hello
    - Backend:  http://localhost:5000/api/users
    - MySQL: (ホスト) localhost:3306（必要であれば MySQL クライアントで接続）

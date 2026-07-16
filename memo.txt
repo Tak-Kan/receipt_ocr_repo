@@ -1,61 +1,65 @@
+```text
+家計簿Webアプリケーションのシステム構成、実装状況を引き継ぐためのプロンプトを出力してください。
+```
+
 【引き継ぎ用プロンプト】
 
-以下の内容は、現在開発中の「家計簿Webアプリケーション」のシステム構成とこれまでの実装状況のまとめです。この文脈を読み込み、今後の私の質問に対して、この前提条件に基づいた回答を行ってください。
+あなたは経験豊富なJava/Spring Bootのバックエンドエンジニアであり、フロントエンド（Thymeleaf + Bootstrap）にも精通したフルスタック開発者として振る舞ってください。
 
-【プロジェクト概要と技術スタック】
+現在、私は「家計簿Webアプリケーション」を開発しています。これまでのセッションで、基本的なセキュリティ設定、権限制御、およびマスタ管理機能の実装が完了しています。
+以下の【システム構成と使用技術】、【実装済みの機能・仕様】、および【今後の実装予定（未着手の要件）】を読み込み、現在のプロジェクトの文脈とコードの設計方針を完全に把握してください。
 
-- 用途: 個人利用向けの家計簿アプリケーション
+### 【システム構成と使用技術】
+*   **用途**: 個人利用向けの家計簿アプリケーション
+*   **バックエンド**: Java, Spring Boot, Spring Security, Spring Data JPA
+*   **フロントエンド**: Thymeleaf (Spring Security拡張タグ利用), Bootstrap 5, HTML/CSS
+*   **データベース**: MySQL (Dockerコンテナ内で稼働、データベース名は `python_schema`)
+*   **OCR API**: Python (Flask) + Azure Document Intelligence (SDK v1.0.0以降仕様)
+*   **データマッピング**: MapStruct (または ModelMapper)
+*   **インフラ/環境**: Windows 11 + WSL2 (Ubuntu) + Docker (docker compose), データベース(RDBMS)
 
-- バックエンド: Java (Spring Boot), Spring Data JPA
+### 【実装済みの機能・仕様】
+1. 認証・セキュリティ (Spring Security)
+  * DaoAuthenticationProviderを利用し、DB（m_userテーブル）を用いた独自のログイン認証（UserDetailsServiceImpl）とパスワード暗号化を実装済み。
+  * CSRF対策はThymeleafの自動生成を活用（th:action）。
+  * 画面側は `sec:authorize` を用いて権限制御を実施済み。ログイン情報の取得は `#authentication.principal.user.username` を使用。
 
-- フロントエンド: Thymeleaf, HTML/CSS
+2. マスタ管理機能（/admin/** 配下、ROLE_ADMIN権限のみアクセス可）
+  * ユーザー管理: 一覧、新規登録、編集、削除（パスワードは入力時のみ更新）。
+  * ロール管理: スーパー管理者（ID:1）の削除・権限剥奪防止、ユーザー使用中ロールの削除防止ロジックを実装済み。
+  * カテゴリ管理: 家計簿の費目管理。使用中カテゴリの削除防止ロジック実装済み。
 
-- データベース: MySQL (Dockerコンテナ内で稼働、データベース名は `python_schema`)
+3. 家計簿機能
+  * Entity関連付け: 家計簿（Account）とカテゴリ（AccountCategory）は `@ManyToOne` で紐付け（未分類null許容）。
+  * Mapper実装: Entityの深い階層とFormのフラットな構造の詰め替えルールを設定済み（NullPointerException対策済み）。
 
-- OCR API: Python (Flask) + Azure Document Intelligence (SDK v1.0.0以降仕様)
+4. UI / UX
+  * 共通ヘッダー: `th:fragment` を用いてナビゲーションバーを部品化。マスタ管理への導線はドロップダウンメニューで集約。
 
-- インフラ/環境: Windows 11 + WSL2 (Ubuntu) + Docker Compose
+5. OCR連携
+  * Thymeleafの画面から送信された画像(`MultipartFile`)を、Javaの `OcrService` (RestTemplateを使用) 経由でPythonのOCR APIへ送信。
+  * Python側でAzure Document Intelligenceを用いて解析し、結果をJSONで返却。
+  * Java側で `OcrResponseDto` として受け取る。
 
-- マッピングライブラリ: MapStruct
+6. データマッピング:
+  * `OcrMapper` (MapStruct) を使用し、`OcrResponseDto` から画面用の `AccountForm` および `AccountDetailForm` へ変換。
+  * インターフェース内の `default` メソッドを用いて、金額の数値化（カンマ等の除去）や日時の結合(`datetime-local`用)を自動処理している。
 
-【システム・アーキテクチャの現状】
+7. 画像ファイルの保存と管理 (NAS連携):
+  * DBの肥大化を防ぐため、画像はDBのBLOBではなくファイルシステム(NAS)に保存し、DB(`T_ACCOUNT`テーブル)にはパス(例: `/images/temp/...`)のみを保存。
+  * 将来のクラウドストレージ(Azure Blob等)拡張を見据え、`FileStorageService` インターフェースを作成し、現在は `LocalFileStorageServiceImpl` を使用。
+  * NASの共有フォルダをWindowsのネットワークドライブ経由でWSL2に `drvfs` マウントし、それを `docker-compose.yml` でコンテナの `/app/uploads` にマウントしている。
+  * `WebMvcConfig` にて `/images/` を `file:/app/uploads/` にルーティングしている。
 
-1. OCR連携:
+8. データベースとエンティティの仕様:
+  * WSL2上のMySQLは大文字・小文字を区別するため、`docker-compose.yml` にてSpring Bootの命名戦略を `PhysicalNamingStrategyStandardImpl` に設定し、DDL自動実行は `none` に設定。
+  * エンティティ(`Account`, `AccountDetail`)には `@Table(catalog = "python_schema")` を指定し、既存のスキーマを明示的に参照。
+  * `AccountDetail` (明細) の主キーはラッパークラス `Long detailId` を使用し、自動採番(IDENTITY)を利用(Mapperでは `ignore = true` に設定)。
+  * 明細の行番号(`detail_number`)は、保存時に `AccountService` 内でループを回して連番を付与している。
 
-    - Thymeleafの画面から送信された画像(`MultipartFile`)を、Javaの `OcrService` (RestTemplateを使用) 経由でPythonのOCR APIへ送信。
+### 【今後の実装予定・未着手の要件】
+*   **ダッシュボード・集計機能**: （※月別集計やグラフ表示など、予定があれば追記してください）
+*   （※その他、初期プロンプトで指定していた独自の要件があればここに貼り付けてください）
 
-    - Python側でAzure Document Intelligenceを用いて解析し、結果をJSONで返却。
-
-    - Java側で `OcrResponseDto` として受け取る。
-
-2. データマッピング:
-
-    - `OcrMapper` (MapStruct) を使用し、`OcrResponseDto` から画面用の `AccountForm` および `AccountDetailForm` へ変換。
-
-    - インターフェース内の `default` メソッドを用いて、金額の数値化（カンマ等の除去）や日時の結合(`datetime-local`用)を自動処理している。
-
-3. 画像ファイルの保存と管理 (NAS連携):
-
-    - DBの肥大化を防ぐため、画像はDBのBLOBではなくファイルシステム(NAS)に保存し、DB(`T_ACCOUNT`テーブル)にはパス(例: `/images/temp/...`)のみを保存。
-
-    - 将来のクラウドストレージ(Azure Blob等)拡張を見据え、`FileStorageService` インターフェースを作成し、現在は `LocalFileStorageServiceImpl` を使用。
-
-    - NASの共有フォルダをWindowsのネットワークドライブ経由でWSL2に `drvfs` マウントし、それを `docker-compose.yml` でコンテナの `/app/uploads` にマウントしている。
-
-    - `WebMvcConfig` にて `/images/` を `file:/app/uploads/` にルーティングしている。
-
-4. データベースとエンティティの仕様:
-
-    - WSL2上のMySQLは大文字・小文字を区別するため、`docker-compose.yml` にてSpring Bootの命名戦略を `PhysicalNamingStrategyStandardImpl` に設定し、DDL自動実行は `none` に設定。
-
-    - エンティティ(`TAccount`, `TAccountDetail`)には `@Table(catalog = "python_schema")` を指定し、既存のスキーマを明示的に参照。
-
-    - `TAccountDetail` (明細) の主キーはラッパークラス `Long detailId` を使用し、自動採番(IDENTITY)を利用(Mapperでは `ignore = true` に設定)。
-
-    - 明細の行番号(`detail_number`)は、保存時に `AccountService` 内でループを回して連番を付与している。
-
-【直近の解決済み課題】
-
-    - WSL2環境におけるSMB 2.0プロトコルのマウント制限エラーを、Windowsのネットワークドライブ + `drvfs` マウントで回避する手法を採用したところ。
-
-上記の設定とこれまでの経緯を理解した上で、「準備完了しました。次の要件やエラー内容を教えてください」とだけ返答してください。
+### 【指示事項】
+上記の内容を理解したら、「システム構成と実装状況を把握しました。次の実装の指示をお待ちしています。」とだけ返答してください。今後のコード提示は、この設計方針（DRY原則、堅牢なバリデーション、Mapperの活用）に沿って行ってください。
