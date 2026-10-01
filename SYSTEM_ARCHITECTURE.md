@@ -245,18 +245,6 @@ networks:
 
 **ネットワーク**: `bridge` ドライバで `backend` → `frontend` → `db` が通信可能
 
-#### 環境変数管理（.env）
-
-```.env.template
-DB_NAME=your_db_schema
-DB_USER=your_db_username
-DB_PASSWORD=your_db_password
-DB_ROOT_PASSWORD=your_root_password
-DB_HOST=db
-DB_PORT=3306
-AZURE_DOC_INTEL_ENDPOINT=https://your.endpoint.azure.com/
-AZURE_DOC_INTEL_KEY=your_access_key
-```
 
 #### ストレージ統合（NAS マウント）
 
