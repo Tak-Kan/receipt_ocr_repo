@@ -5,13 +5,13 @@ WORKDIR /build
 # 依存解決のため先に pom をコピーして依存をダウンロード
 COPY pom.xml .
 # キャッシュ用に依存解決のみ
-# RUN mvn -B -f pom.xml dependency:go-offline
-RUN --mount=type=cache,target=/root/.m2 mvn -B -f pom.xml dependency:go-offline -DskipTests
+RUN mvn -B -f pom.xml dependency:go-offline -DskipTests
+# RUN --mount=type=cache,target=/root/.m2 mvn -B -f pom.xml dependency:go-offline -DskipTests
 
 # ソースをコピーしてビルド
 COPY src ./src
-# RUN mvn -B -f pom.xml package -DskipTests
-RUN --mount=type=cache,target=/root/.m2 mvn -B -f pom.xml package -DskipTests
+RUN mvn -B -f pom.xml package -DskipTests
+# RUN --mount=type=cache,target=/root/.m2 mvn -B -f pom.xml package -DskipTests
 
 # ランタイムイメージ
 FROM eclipse-temurin:17-jre
