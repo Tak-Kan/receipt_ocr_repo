@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Controller
 @RequestMapping("/account")
@@ -130,18 +132,28 @@ public class AccountController {
         // 本登録のタイミングで、tempから本保存先（NAS or クラウド）へ転送！
         // 転送先がどこであっても、メソッドを呼ぶだけで適切なURLパスが返ってきます        
         String currentImagePath = accountForm.getReceiptImagePath();
+        
+        String userName = (auth != null) ? auth.getName() : "anonymous";
+        String finalImagePath = null;
 
-        // パスに "temp" が含まれている場合のみ、本番ディレクトリへ移動する
-        if (currentImagePath != null && currentImagePath.contains("/temp/")) {
-            String finalImagePath = fileStorageService.moveToReceipts(currentImagePath);
+        // パスに "/images/temp/" で始まる場合のみ、本番ディレクトリへ移動する
+        if (currentImagePath != null && currentImagePath.startsWith("/images/temp/")) {
+            finalImagePath = fileStorageService.moveToReceipts(
+                currentImagePath, userName, LocalDate.now(ZoneId.of("Asia/Tokyo")));
             // DBにはこの確定したパスを保存する
             accountForm.setReceiptImagePath(finalImagePath);
         }
-        
-        String userName = (auth != null) ? auth.getName() : "anonymous";
 
-        // サービス処理へ
-        accountService.saveAccount(accountForm, userName);
+        try {
+            // サービス処理へ
+            accountService.saveAccount(accountForm, userName);
+        } catch (RuntimeException e) {
+            // DB 登録に失敗したら、アップロード済みの S3 画像が孤立しないよう削除する
+            if (finalImagePath != null) {
+                fileStorageService.deleteFile(finalImagePath);
+            }
+            throw e;
+        }
 
         return "redirect:/top";
     }

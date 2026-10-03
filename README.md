@@ -1,4 +1,4 @@
-# dj_test_2025
+# receipt_ocr_repo
 # Docker Compose サンプル: Flask (Python) + Spring Boot (Java) + MariaDB
 
 ## 概要
