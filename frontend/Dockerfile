@@ -21,7 +21,7 @@ COPY ap-northeast-3-bundle.pem /app/ap-northeast-3-bundle.pem
 RUN keytool -importcert \
     -noprompt \
     -trustcacerts \
-    -alias rds-ca \
+    -alias ap-northeast-3-bundle \
     -file /app/ap-northeast-3-bundle.pem \
     -keystore "$JAVA_HOME/lib/security/cacerts" \
     -storepass changeit
