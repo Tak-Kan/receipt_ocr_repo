@@ -23,7 +23,7 @@ services:
     container_name: sample-frontend
     restart: unless-stopped
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSsl=true
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
       - SPRING_DATASOURCE_USERNAME=${DB_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - BACKEND_API_URL=http://backend:5000/api
@@ -34,10 +34,6 @@ services:
       - "8080:8080"
     networks:
       - sample-network
-    volumes:
-      # 左側がWSL2(NAS)のパス、右側がコンテナ(Spring Boot)内のパス
-      - /mnt/nas/hams_uploads:/app/uploads
-      - ${HOME}/.aws:/root/.aws:ro
 
 volumes:
   db-data:
