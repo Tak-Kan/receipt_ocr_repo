@@ -16,13 +16,13 @@ RUN mvn -B -f pom.xml package -DskipTests
 # ランタイムイメージ
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-COPY rds-ca.pem /app/rds-ca.pem
+COPY ap-northeast-3-bundle.pem /app/ap-northeast-3-bundle.pem
 # 証明書をJavaのTrustStoreへ登録
 RUN keytool -importcert \
     -noprompt \
     -trustcacerts \
     -alias rds-ca \
-    -file /app/rds-ca.pem \
+    -file /app/ap-northeast-3-bundle.pem \
     -keystore "$JAVA_HOME/lib/security/cacerts" \
     -storepass changeit
 COPY --from=builder /build/target/demo-0.0.1-SNAPSHOT.jar /app/app.jar
