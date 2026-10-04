@@ -27,6 +27,9 @@ services:
       - SPRING_DATASOURCE_USERNAME=${DB_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - BACKEND_API_URL=http://backend:5000/api
+      - APP_STORAGE_S3_BUCKET=${S3_BUCKET}
+      - APP_STORAGE_S3_REGION=${AWS_REGION}
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
     ports:
       - "8080:8080"
     networks:
@@ -34,6 +37,7 @@ services:
     volumes:
       # 左側がWSL2(NAS)のパス、右側がコンテナ(Spring Boot)内のパス
       - /mnt/nas/hams_uploads:/app/uploads
+      - ${HOME}/.aws:/root/.aws:ro
 
 volumes:
   db-data:

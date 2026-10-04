@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
 
 @Slf4j
 public class LocalFileStorageServiceImpl implements FileStorageService {
@@ -39,7 +40,7 @@ public class LocalFileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public String moveToReceipts(String tempImagePath) {
+    public String moveToReceipts(String tempImagePath, String userId, LocalDate date) {
         try {
             // Web用のパス（/images/temp/xxx.jpg）から、実際のファイル名（xxx.jpg）を抽出
             String fileName = tempImagePath.substring(tempImagePath.lastIndexOf("/") + 1);

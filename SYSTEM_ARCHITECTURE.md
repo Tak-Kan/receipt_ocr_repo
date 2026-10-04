@@ -346,6 +346,7 @@ Thymeleaf (top.html 表示、`sec:authorize` で権限表示制御)
 ### 5. **ファイル管理**
 - `FileStorageService` インターフェース（戦略パターン）
 - `LocalFileStorageServiceImpl`: ローカル/NAS 保存
+- `S3FileStorageServiceImpl`: AWS S3ストレージ 保存
 - 将来: Azure Blob Storage への拡張用設計
 
 ### 6. **UI / UX**

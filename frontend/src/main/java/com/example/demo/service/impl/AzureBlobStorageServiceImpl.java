@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 
 public class AzureBlobStorageServiceImpl implements FileStorageService {
 
@@ -22,7 +23,7 @@ public class AzureBlobStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public String moveToReceipts(String tempImagePath) {
+    public String moveToReceipts(String tempImagePath, String userId, LocalDate date) {
         // ★ここを書き換える
         // 1. ローカルのtempフォルダから該当ファイルを読み込む
         // 2. Azure Blob Storage の SDK を使ってクラウドへアップロードする
