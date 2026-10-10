@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
@@ -20,6 +21,17 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
      * @return 家計簿情報のリスト
      */
     boolean existsByAccountCategory_CategoryId(Integer categoryId);
+
+    /**
+     * IDと登録ユーザーの両方で家計簿情報を1件取得します。
+     * 他のユーザーのデータは「存在しない」ものとして扱うため、詳細表示・更新・削除では
+     * 必ずこのメソッド経由で取得してください（IDだけで取得すると他人のデータに触れてしまいます）。
+     *
+     * @param accountId 家計簿ID
+     * @param entryUser 登録ユーザー（ログイン中のユーザーコード）
+     * @return 該当する家計簿情報（他人のデータ・存在しないIDの場合は空）
+     */
+    Optional<Account> findByAccountIdAndEntryUser(Long accountId, String entryUser);
 
     /**
      * ログイン中ユーザーの家計簿情報をすべて取得します（購入日時の新しい順）

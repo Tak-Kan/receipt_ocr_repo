@@ -5,6 +5,10 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 
 public interface FileStorageService {
+
+    /** 一時保存した画像のWeb用パスの先頭部分（saveToTempが返すパスはこれで始まる） */
+    String TEMP_PATH_PREFIX = "/images/temp/";
+
     /**
      * 一時フォルダに画像を保存する（OCR用）
      */
