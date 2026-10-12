@@ -29,8 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
-import java.time.LocalDate;
-import java.time.ZoneId;
 
 @Controller
 @RequestMapping("/account")
@@ -129,31 +127,13 @@ public class AccountController {
             return "hams_confirm"; // hams_confirm.htmlへ戻る（エラーメッセージはThymeleaf側で表示可能）
         }
 
-        // 本登録のタイミングで、tempから本保存先（NAS or クラウド）へ転送！
-        // 転送先がどこであっても、メソッドを呼ぶだけで適切なURLパスが返ってきます        
-        String currentImagePath = accountForm.getReceiptImagePath();
-        
         String userName = (auth != null) ? auth.getName() : "anonymous";
-        String finalImagePath = null;
 
-        // パスに "/images/temp/" で始まる場合のみ、本番ディレクトリへ移動する
-        if (currentImagePath != null && currentImagePath.startsWith("/images/temp/")) {
-            finalImagePath = fileStorageService.moveToReceipts(
-                currentImagePath, userName, LocalDate.now(ZoneId.of("Asia/Tokyo")));
-            // DBにはこの確定したパスを保存する
-            accountForm.setReceiptImagePath(finalImagePath);
-        }
-
-        try {
-            // サービス処理へ
-            accountService.saveAccount(accountForm, userName);
-        } catch (RuntimeException e) {
-            // DB 登録に失敗したら、アップロード済みの S3 画像が孤立しないよう削除する
-            if (finalImagePath != null) {
-                fileStorageService.deleteFile(finalImagePath);
-            }
-            throw e;
-        }
+        // サービス処理へ
+        // ・更新の場合は、対象が本人のデータであることを確認する
+        // ・画像パスの検証と、tempから本保存先（NAS / S3 など）への転送もサービス側で行う
+        // ・DB登録に失敗した場合の、転送済み画像の削除（孤立防止）もサービス側で行う
+        accountService.saveAccount(accountForm, userName);
 
         return "redirect:/top";
     }
@@ -182,8 +162,8 @@ public class AccountController {
     public String showEdit(@PathVariable("id") Long id, Authentication auth, Model model) {
         String userName = (auth != null) ? auth.getName() : "anonymous";
         model.addAttribute("userName", userName);
-        // 1. DBからデータを取得
-        Account account = accountService.findById(id);
+        // 1. DBからデータを取得（ログイン中ユーザー本人のデータのみ。他人のIDなら404）
+        Account account = accountService.findByIdAndOwner(id, userName);
         
         // 2. Entity を Form に変換
         AccountForm accountForm = accountMapper.toForm(account);
@@ -201,10 +181,11 @@ public class AccountController {
      */
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('AUTH_DELETE')") // 💡 URLを直接叩かれても、権限がなければ弾く（403エラーにする）
-    public String delete(@RequestParam("accountId") Long accountId) {
+    public String delete(@RequestParam("accountId") Long accountId, Authentication auth) {
+        String userName = (auth != null) ? auth.getName() : "anonymous";
         // フォーム内の隠し項目（<input type="hidden" th:field="*{accountId}">）
-        // の値だけを受け取って削除処理へ渡す
-        accountService.delete(accountId);
+        // の値と、ログイン中のユーザーを削除処理へ渡す（本人のデータ以外は削除できない）
+        accountService.delete(accountId, userName);
         
         return "redirect:/account/search";
     }
