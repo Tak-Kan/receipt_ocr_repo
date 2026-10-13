@@ -104,6 +104,31 @@ docker compose up --build
 docker compose build --no-cache frontend
 ```
 
+### RDS（MariaDB）のTLS接続とCA証明書
+
+`frontend/ap-northeast-3-bundle.pem` は、RDSのリージョン別CA証明書バンドル（公開証明書）です。`frontend/Dockerfile` が、バンドルに含まれる**すべての**証明書をJavaのTrustStoreに登録し、`sslMode=verify-ca` で接続します。
+
+- バンドルには複数のルートCAが入っています。`keytool -importcert` は1つのファイルから先頭の1枚しか登録しないため、Dockerfileで1枚ずつに分割して登録しています。
+- リージョンを変える場合や、CAが更新された場合は、AWSの公開バンドル（`https://truststore.pki.rds.amazonaws.com/<リージョン>/<リージョン>-bundle.pem`）でこのファイルを差し替え、Dockerfile内のファイル名とエイリアス名も合わせてください。
+- 証明書が見つからない場合は、イメージのビルドが失敗します。
+
+## CI（GitHub Actions）
+
+`.github/workflows/ci.yml` が、プルリクエストと、`main` / `feature/aws-support` へのpushで、テストとビルドの確認だけを行います（デプロイはしません）。
+
+| ジョブ | 内容 |
+|---|---|
+| `frontend` | `mvn verify`（`frontend/src/test` のテストを実行し、jarを作成） |
+| `backend` | `pip install -r requirements.txt`、構文チェック、`import app` による起動確認 |
+| `docker-build` | frontend / backend のDockerイメージをビルド（pushはしない）。frontendは、RDSのCA証明書がすべてTrustStoreに登録されていることも確認 |
+
+手元で同じ確認をするには、次を実行します。
+
+```bash
+(cd frontend && mvn -B verify)
+docker compose build
+```
+
 ## 主要なコード
 
 - `frontend/src/main/java/com/example/demo/security/SecurityConfig.java`: Web認証・認可
